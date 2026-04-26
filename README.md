@@ -4,8 +4,8 @@
   <img src="frontend/static/logo/128.png" alt="Huntarr Logo" width="100" height="100">
 </p>
 
-<a href="https://plexguide.github.io/Huntarr.io/donate.html">
-  <img src="https://img.shields.io/github/sponsors/plexguide?style=flat&logo=github&logoColor=white&label=Support%20Huntarr&color=blue" alt="Support Huntarr" />
+<a href="https://buymeacoffee.com/YOUR_USERNAME">
+  <img src="https://img.shields.io/badge/Support%20Huntarr-Buy%20Me%20a%20Coffee-yellow?style=flat&logo=buymeacoffee" alt="Support Huntarr" />
 </a>
 
 ---
@@ -39,13 +39,8 @@ If Huntarr has been helpful to you and you appreciate the power of open-source s
 ## Table of Contents
 - [Overview](#overview)
 - [Why You Need Huntarr](#why-you-need-huntarr)
-- [Other Projects](#other-projects)
-- [Indexers Approving of Huntarr](#indexers-approving-of-huntarr)
 - [Installation Methods](#installation-methods)
 - [How It Works](#how-it-works)
-- [Thank You](#thank-you)
-- [Screenshots](#screenshots)
-- [The Perfect Pair: Huntarr & Cleanuparr](#the-perfect-pair-huntarr--cleanuparr)
 - [Change Log](#change-log)
 
 ## ℹ️ Overview
@@ -54,7 +49,6 @@ If Huntarr has been helpful to you and you appreciate the power of open-source s
 
 This application continually searches your media libraries for missing content and items that need quality upgrades. It automatically triggers searches for both missing items and those below your quality cutoff. It's designed to run continuously while being gentle on your indexers, helping you gradually complete your media collection with the best available quality.
 
-For detailed documentation, please visit our <a href="https://plexguide.github.io/Huntarr.io/" target="_blank" rel="noopener noreferrer">Wiki</a>. See the <a href="https://plexguide.github.io/Huntarr.io/apps/index.html" target="_blank" rel="noopener noreferrer">3rd Party Apps</a> guide for connecting Sonarr, Radarr, Lidarr, Readarr, Whisparr, Prowlarr, and Swaparr.
 
 ## ❓ Why You Need Huntarr
 
@@ -65,21 +59,6 @@ Think of it as the missing piece that actually completes your media automation s
 
 **The solution**: Huntarr systematically scans your entire library, finds all missing content, and searches for it in small batches that won't overwhelm your indexers or get you banned. It's the difference between having a "mostly complete" library and actually having everything you want.
 
-## 🔀 Other Projects
-
-* [Unraid Intel ARC Deployment](https://github.com/plexguide/Unraid_Intel-ARC_Deployment) - Convert videos to AV1 Format (I've saved 325TB encoding to AV1)
-* Visit [PlexGuide](https://plexguide.com) for more great scripts
-
-
-
-## PayPal Donations – For My Daughter's College Fund
-
-My 12-year-old daughter is passionate about singing, dancing, and exploring STEM. She consistently earns A-B honors! Every donation goes directly into her college fund!
-
-[![Donate with PayPal button](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?hosted_button_id=58AYJ68VVMGSC)
-
-## 👍 Indexers Approving of Huntarr:
-* https://ninjacentral.co.za
 
 ## ⬇️ Installation Methods
 
@@ -90,7 +69,6 @@ My 12-year-old daughter is passionate about singing, dancing, and exploring STEM
 - 🐧 **[Linux Installation](https://plexguide.github.io/Huntarr.io/getting-started/installation.html#linux-installation)**
 - 🔧 **[Alternative Methods](https://plexguide.github.io/Huntarr.io/getting-started/installation.html#alternative-methods)**
 
-Special thanks to [Nwithan8](https://github.com/nwithan8) for maintaining the Unraid templates and helping Huntarr grow through the Unraid Community Applications repository.
 
 ## ⚙️ How It Works
 
@@ -108,49 +86,5 @@ Special thanks to [Nwithan8](https://github.com/nwithan8) for maintaining the Un
 
 ---
 
-## ❤️ Thank You
-
-A big thank you to these amazing contributors who've helped build and maintain this project:
-
-<a href="https://github.com/plexguide/Huntarr.io/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=plexguide/Huntarr.io" alt="Contributors" />
-</a>
-
-## 📸 Screenshots
-
-<p align="center">
-  <img width="100%" alt="Homepage" src="https://github.com/user-attachments/assets/c060962c-01ee-4f53-a5ee-c67f31432e40" style="border: 1px solid #30363d; border-radius: 6px; margin-bottom: 10px;" />
-</p>
-
-<p align="center">
-  <img width="100%" alt="Logger UI" src="https://github.com/user-attachments/assets/93c1a5d3-e82a-416a-8d41-0379ea221d7a" style="border: 1px solid #30363d; border-radius: 6px; margin-bottom: 10px;" />
-</p>
-
-<p align="center">
-  <img width="930" alt="Settings UI" src="https://github.com/user-attachments/assets/e87867f8-0a8c-48d8-b6ef-234caa33e41f" style="border: 1px solid #30363d; border-radius: 6px;" />
-</p>
-
----
-
-## 🤝 The Perfect Pair: Huntarr & Cleanuparr
-
-<p align="center">
-  <img src="https://github.com/plexguide/Huntarr.io/blob/main/frontend/static/logo/128.png?raw=true" alt="Huntarr" width="64" height="64">
-  <span style="font-size: 32px; margin: 0 15px;">+</span>
-  <img src="https://github.com/cleanuparr/cleanuparr/blob/main/Logo/128.png?raw=true" alt="Cleanuparr" width="64" height="64">
-</p>
-
-**Huntarr** is the compulsive librarian who finds missing media and upgrades your existing content. It fills in the blanks and improves what you already have.
-
-**Cleanuparr** (formerly Cleanuperr) ([![GitHub stars](https://img.shields.io/github/stars/cleanuparr/cleanuparr?style=social)](https://github.com/cleanuparr/cleanuparr/stargazers)) is the janitor of your server; it keeps your download queue spotless, removes clutter, and blocks malicious files.
-
-When combined, these tools create a powerful, self-sufficient media automation stack:
-
-- **Huntarr** hunts for content to add to your library
-- **Cleanuparr** ensures only clean downloads get through
-- Together, they create a reliable, hands-off media management system
-
-Learn more about **Cleanuparr** at [https://github.com/cleanuparr/cleanuparr](https://github.com/cleanuparr/cleanuparr)
-
 ## 📜 Change Log
-Visit: https://github.com/plexguide/Huntarr.io/releases/
+See [CHANGELOG.md](CHANGELOG.md) for the full history of changes.
