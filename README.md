@@ -4,7 +4,7 @@
   <img src="frontend/static/logo/128.png" alt="Huntarr Logo" width="100" height="100">
 </p>
 
-<a href="https://buymeacoffee.com/YOUR_USERNAME">
+<a href="https://buymeacoffee.com/jacobrussell_medic">
   <img src="https://img.shields.io/badge/Support%20Huntarr-Buy%20Me%20a%20Coffee-yellow?style=flat&logo=buymeacoffee" alt="Support Huntarr" />
 </a>
 
