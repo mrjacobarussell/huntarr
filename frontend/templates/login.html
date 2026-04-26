@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Huntarr Login</title>
+    <title>Huntarr Revisited Login</title>
     <link rel="preload" href="./static/logo/256.png" as="image" fetchpriority="high">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" href="./static/logo/16.png">
@@ -17,8 +17,8 @@
 
     <div class="login-container">
         <div class="login-header">
-            <img src="./static/logo/256.png" alt="Huntarr" class="login-logo">
-            <h1>Huntarr</h1>
+            <img src="./static/logo/256.png" alt="Huntarr Revisited" class="login-logo">
+            <h1>Huntarr Revisited</h1>
         </div>
         <div class="login-form">
             <h2>Log in to your account</h2>
@@ -332,7 +332,7 @@
                     setTimeout(() => { window.location.href = data.redirect || './'; }, 1500);
                 } else {
                     if (status === 409) setPlexStatus('error', 'Local user exists. Please link your Plex account in user settings.');
-                    else if (status === 403) setPlexStatus('error', 'This Plex account is not linked to this Huntarr instance. Please link your account in user settings first.');
+                    else if (status === 403) setPlexStatus('error', 'This Plex account is not linked to this Huntarr Revisited instance. Please link your account in user settings first.');
                     else setPlexStatus('error', 'Login failed: ' + (data.error || 'Unknown error'));
                 }
             })
