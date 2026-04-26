@@ -27,6 +27,7 @@ from .profiles import (
 from .clients import get_movie_clients_config
 from .storage import get_detected_movies_from_all_roots
 from ...utils.logger import logger
+from ...settings_manager import get_tmdb_api_key as _get_tmdb_api_key_from_settings
 
 
 # --- Newznab search ---
@@ -316,7 +317,7 @@ def _collection_append(title, year, instance_id, tmdb_id=None, poster_path=None,
 
 def _get_tmdb_api_key_movie_hunt():
     """TMDB API key for Movie Hunt discover only."""
-    return "9265b0bd0cd1962f7f3225989fcd7192"
+    return _get_tmdb_api_key_from_settings()
 
 
 def _fetch_tmdb_release_dates(tmdb_id):

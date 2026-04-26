@@ -326,6 +326,13 @@ def get_api_key(app_name: str) -> Optional[str]:
     """Get the API Key for a specific app."""
     return get_setting(app_name, "api_key", "")
 
+_TMDB_FALLBACK_KEY = "9265b0bd0cd1962f7f3225989fcd7192"
+
+def get_tmdb_api_key() -> str:
+    """Return user-configured TMDB API key, falling back to the embedded key."""
+    user_key = (get_setting("general", "tmdb_api_key", "") or "").strip()
+    return user_key if user_key else _TMDB_FALLBACK_KEY
+
 
 def _is_dev_mode_from_general(general_dict: Dict[str, Any]) -> bool:
     """Compute dev mode from a general settings dict. Used to avoid load_settings recursion when saving general."""

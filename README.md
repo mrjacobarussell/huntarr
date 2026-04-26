@@ -30,12 +30,6 @@ If Huntarr has been helpful to you and you appreciate the power of open-source s
 
 </div>
 
-## Table of Contents
-- [Overview](#overview)
-- [Why You Need Huntarr](#why-you-need-huntarr)
-- [Installation Methods](#installation-methods)
-- [How It Works](#how-it-works)
-- [Change Log](#change-log)
 
 ## ℹ️ Overview
 

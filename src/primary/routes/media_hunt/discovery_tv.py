@@ -25,7 +25,7 @@ from ...utils.logger import logger
 
 
 # --- TMDB API ---
-TMDB_API_KEY = "9265b0bd0cd1962f7f3225989fcd7192"
+from ...settings_manager import get_tmdb_api_key as _get_tmdb_api_key
 TMDB_BASE = "https://api.themoviedb.org/3"
 
 # TV Newznab categories (5000-series)
@@ -50,7 +50,7 @@ def _lookup_tvdb_id_from_tmdb(tmdb_id):
     try:
         from src.primary.settings_manager import get_ssl_verify_setting
         verify_ssl = get_ssl_verify_setting()
-        url = f"{TMDB_BASE}/tv/{tmdb_id}/external_ids?api_key={TMDB_API_KEY}"
+        url = f"{TMDB_BASE}/tv/{tmdb_id}/external_ids?api_key={_get_tmdb_api_key()}"
         r = requests.get(url, timeout=10, verify=verify_ssl)
         if r.status_code == 200:
             data = r.json()
@@ -422,7 +422,7 @@ def add_series_to_tv_hunt_collection(
         from src.primary.settings_manager import get_ssl_verify_setting
         verify_ssl = get_ssl_verify_setting()
         r = requests.get(f'{TMDB_BASE}/tv/{tmdb_id}', params={
-            'api_key': TMDB_API_KEY, 'language': 'en-US'
+            'api_key': _get_tmdb_api_key(), 'language': 'en-US'
         }, timeout=15, verify=verify_ssl)
         if r.status_code != 200:
             return False, f"Failed to fetch series from TMDB: {r.status_code}"
@@ -437,7 +437,7 @@ def add_series_to_tv_hunt_collection(
             if not episodes:
                 try:
                     sr = requests.get(f'{TMDB_BASE}/tv/{tmdb_id}/season/{season_num}', params={
-                        'api_key': TMDB_API_KEY, 'language': 'en-US'
+                        'api_key': _get_tmdb_api_key(), 'language': 'en-US'
                     }, timeout=15, verify=verify_ssl)
                     if sr.status_code == 200:
                         episodes = sr.json().get('episodes', [])
@@ -833,7 +833,7 @@ def register_tv_discovery_routes(bp):
             data = get_discover('tv', cache_params)
             if data is None:
                 params = {
-                    'api_key': TMDB_API_KEY,
+                    'api_key': _get_tmdb_api_key(),
                     'language': 'en-US',
                     'sort_by': sort_by,
                     'page': page,
@@ -876,7 +876,7 @@ def register_tv_discovery_routes(bp):
             data = get_search('tv', cache_key)
             if data is None:
                 params = {
-                    'api_key': TMDB_API_KEY,
+                    'api_key': _get_tmdb_api_key(),
                     'language': 'en-US',
                     'query': q,
                     'page': page,
@@ -909,7 +909,7 @@ def register_tv_discovery_routes(bp):
                 return jsonify(cached), 200
 
             params = {
-                'api_key': TMDB_API_KEY,
+                'api_key': _get_tmdb_api_key(),
                 'language': 'en-US',
                 'append_to_response': 'external_ids,content_ratings',
             }
@@ -937,7 +937,7 @@ def register_tv_discovery_routes(bp):
                 return jsonify(cached), 200
 
             params = {
-                'api_key': TMDB_API_KEY,
+                'api_key': _get_tmdb_api_key(),
                 'language': 'en-US',
             }
             from src.primary.settings_manager import get_ssl_verify_setting
@@ -1001,7 +1001,7 @@ def register_tv_discovery_routes(bp):
                     from src.primary.settings_manager import get_ssl_verify_setting
                     verify_ssl = get_ssl_verify_setting()
                     r = requests.get(f'{TMDB_BASE}/tv/{tmdb_id}', params={
-                        'api_key': TMDB_API_KEY, 'language': 'en-US'
+                        'api_key': _get_tmdb_api_key(), 'language': 'en-US'
                     }, timeout=15, verify=verify_ssl)
                     if r.status_code == 200:
                         tmdb_data = r.json()
@@ -1038,7 +1038,7 @@ def register_tv_discovery_routes(bp):
                         from src.primary.settings_manager import get_ssl_verify_setting
                         verify_ssl = get_ssl_verify_setting()
                         sr = requests.get(f'{TMDB_BASE}/tv/{tmdb_id}/season/{season_num}', params={
-                            'api_key': TMDB_API_KEY, 'language': 'en-US'
+                            'api_key': _get_tmdb_api_key(), 'language': 'en-US'
                         }, timeout=15, verify=verify_ssl)
                         if sr.status_code == 200:
                             episodes = sr.json().get('episodes', [])

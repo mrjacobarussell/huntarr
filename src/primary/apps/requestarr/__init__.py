@@ -6,6 +6,7 @@ import requests
 import logging
 from typing import Dict, List, Any, Optional
 from src.primary.utils.database import get_database
+from src.primary.settings_manager import get_tmdb_api_key as _get_tmdb_api_key
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +31,8 @@ class RequestarrAPI:
         self.tmdb_image_base_url = "https://image.tmdb.org/t/p/w500"
     
     def get_tmdb_api_key(self) -> str:
-        """Get hardcoded TMDB API key"""
-        return "9265b0bd0cd1962f7f3225989fcd7192"
+        """Return user-configured TMDB API key, falling back to the embedded key."""
+        return _get_tmdb_api_key()
     
     def get_trending(self, time_window: str = 'week', movie_instance: str = '', tv_instance: str = '', movie_app_type: str = 'radarr', tv_app_type: str = 'sonarr', page: int = 1) -> List[Dict[str, Any]]:
         """Get trending movies and TV shows sorted by popularity"""

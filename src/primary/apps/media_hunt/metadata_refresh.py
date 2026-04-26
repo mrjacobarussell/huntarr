@@ -24,12 +24,12 @@ from datetime import date, datetime, timedelta, timezone
 import requests
 
 from src.primary.utils.logger import get_logger
+from src.primary.settings_manager import get_tmdb_api_key as _get_tmdb_api_key
 
 tv_logger = get_logger("tv_hunt")
 movie_logger = get_logger("movie_hunt")
 
 TMDB_BASE = "https://api.themoviedb.org/3"
-TMDB_API_KEY = "9265b0bd0cd1962f7f3225989fcd7192"
 
 # Throttling: minimum days between refreshes per item
 TV_REFRESH_COOLDOWN_DAYS = 7
@@ -152,7 +152,7 @@ def refresh_tv_hunt_metadata(instance_id: int, stop_check=None) -> int:
             try:
                 r = requests.get(
                     f'{TMDB_BASE}/tv/{tmdb_id}',
-                    params={'api_key': TMDB_API_KEY, 'language': 'en-US'},
+                    params={'api_key': _get_tmdb_api_key(), 'language': 'en-US'},
                     timeout=15, verify=verify_ssl
                 )
                 if r.status_code != 200:
@@ -178,7 +178,7 @@ def refresh_tv_hunt_metadata(instance_id: int, stop_check=None) -> int:
                     try:
                         sr = requests.get(
                             f'{TMDB_BASE}/tv/{tmdb_id}/season/{season_num}',
-                            params={'api_key': TMDB_API_KEY, 'language': 'en-US'},
+                            params={'api_key': _get_tmdb_api_key(), 'language': 'en-US'},
                             timeout=15, verify=verify_ssl
                         )
                         if sr.status_code != 200:
@@ -285,7 +285,7 @@ def refresh_movie_hunt_metadata(instance_id: int, stop_check=None) -> int:
                 verify_ssl = _get_ssl_verify()
                 r = requests.get(
                     f'{TMDB_BASE}/movie/{tmdb_id}',
-                    params={'api_key': TMDB_API_KEY, 'language': 'en-US'},
+                    params={'api_key': _get_tmdb_api_key(), 'language': 'en-US'},
                     timeout=10, verify=verify_ssl
                 )
                 if r.status_code == 200:

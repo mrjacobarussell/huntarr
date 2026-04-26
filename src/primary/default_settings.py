@@ -296,6 +296,7 @@ GENERAL_DEFAULTS = {
     "ssl_verify": True,
     "base_url": "",
     "dev_key": "",
+    "tmdb_api_key": "",
     "log_rotation_enabled": True,
     "log_max_size_mb": 50,
     "log_backup_count": 5,

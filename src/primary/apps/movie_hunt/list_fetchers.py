@@ -8,11 +8,9 @@ import time
 import requests
 import xml.etree.ElementTree as ET
 from src.primary.utils.logger import get_logger
+from src.primary.settings_manager import get_tmdb_api_key as _get_tmdb_api_key
 
 logger = get_logger("import_lists")
-
-# TMDb API key (same as Movie Hunt discovery)
-TMDB_API_KEY = "9265b0bd0cd1962f7f3225989fcd7192"
 TMDB_BASE = "https://api.themoviedb.org/3"
 REQUEST_TIMEOUT = 20
 
@@ -57,7 +55,7 @@ def _resolve_imdb_to_tmdb(imdb_id):
 
         resp = requests.get(
             f"{TMDB_BASE}/find/{imdb_id}",
-            params={'api_key': TMDB_API_KEY, 'external_source': 'imdb_id'},
+            params={'api_key': _get_tmdb_api_key(), 'external_source': 'imdb_id'},
             timeout=REQUEST_TIMEOUT
         )
         if resp.status_code != 200:
@@ -89,7 +87,7 @@ def _search_tmdb_by_title(title, year=None):
         cache_key = f"{title}:y{year or ''}"
         data = get_search('movie', cache_key)
         if data is None:
-            params = {'api_key': TMDB_API_KEY, 'query': title}
+            params = {'api_key': _get_tmdb_api_key(), 'query': title}
             if year:
                 params['year'] = year
             resp = requests.get(f"{TMDB_BASE}/search/movie", params=params, timeout=REQUEST_TIMEOUT)
@@ -130,7 +128,7 @@ def _tmdb_movie_details(tmdb_id):
 
         resp = requests.get(
             f"{TMDB_BASE}/movie/{tmdb_id}",
-            params={'api_key': TMDB_API_KEY},
+            params={'api_key': _get_tmdb_api_key()},
             timeout=REQUEST_TIMEOUT
         )
         if resp.status_code != 200:
@@ -180,7 +178,7 @@ def _fetch_imdb_chart(chart_type):
             for page in range(1, 6):  # ~100 movies
                 resp = requests.get(
                     f"{TMDB_BASE}/movie/top_rated",
-                    params={'api_key': TMDB_API_KEY, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:
@@ -196,7 +194,7 @@ def _fetch_imdb_chart(chart_type):
             for page in range(1, 4):  # ~60 movies
                 resp = requests.get(
                     f"{TMDB_BASE}/movie/popular",
-                    params={'api_key': TMDB_API_KEY, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:
@@ -301,7 +299,7 @@ def _fetch_tmdb(settings):
             if data is None:
                 resp = requests.get(
                     f"{TMDB_BASE}/movie/{list_type}",
-                    params={'api_key': TMDB_API_KEY, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:
@@ -329,7 +327,7 @@ def _fetch_tmdb(settings):
             if data is None:
                 resp = requests.get(
                     f"{TMDB_BASE}/list/{list_id}",
-                    params={'api_key': TMDB_API_KEY, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:
@@ -366,7 +364,7 @@ def _fetch_tmdb(settings):
             if data is None:
                 resp = requests.get(
                     f"{TMDB_BASE}/discover/movie",
-                    params={'api_key': TMDB_API_KEY, 'with_keywords': keyword_id, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'with_keywords': keyword_id, 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:
@@ -393,7 +391,7 @@ def _fetch_tmdb(settings):
             if data is None:
                 resp = requests.get(
                     f"{TMDB_BASE}/discover/movie",
-                    params={'api_key': TMDB_API_KEY, 'with_companies': company_id, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'with_companies': company_id, 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:
@@ -420,7 +418,7 @@ def _fetch_tmdb(settings):
             if data is None:
                 resp = requests.get(
                     f"{TMDB_BASE}/discover/movie",
-                    params={'api_key': TMDB_API_KEY, 'with_people': person_id, 'page': page},
+                    params={'api_key': _get_tmdb_api_key(), 'with_people': person_id, 'page': page},
                     timeout=REQUEST_TIMEOUT
                 )
                 if resp.status_code != 200:

@@ -8,10 +8,9 @@ import os
 import time
 import requests
 from src.primary.utils.logger import get_logger
+from src.primary.settings_manager import get_tmdb_api_key as _get_tmdb_api_key
 
 logger = get_logger("tv_import_lists")
-
-TMDB_API_KEY = "9265b0bd0cd1962f7f3225989fcd7192"
 TMDB_BASE = "https://api.themoviedb.org/3"
 REQUEST_TIMEOUT = 20
 
@@ -53,7 +52,7 @@ def _search_tmdb_tv(title, year=None):
         cache_key = f"{title}:y{year or ''}"
         data = get_search('tv', cache_key)
         if data is None:
-            params = {'api_key': TMDB_API_KEY, 'query': title}
+            params = {'api_key': _get_tmdb_api_key(), 'query': title}
             if year:
                 params['first_air_date_year'] = year
             resp = requests.get(f"{TMDB_BASE}/search/tv", params=params, timeout=REQUEST_TIMEOUT)
@@ -93,7 +92,7 @@ def _tmdb_tv_details(tmdb_id):
 
         resp = requests.get(
             f"{TMDB_BASE}/tv/{tmdb_id}",
-            params={'api_key': TMDB_API_KEY},
+            params={'api_key': _get_tmdb_api_key()},
             timeout=REQUEST_TIMEOUT
         )
         if resp.status_code != 200:
@@ -123,7 +122,7 @@ def _resolve_imdb_to_tmdb_tv(imdb_id):
 
         resp = requests.get(
             f"{TMDB_BASE}/find/{imdb_id}",
-            params={'api_key': TMDB_API_KEY, 'external_source': 'imdb_id'},
+            params={'api_key': _get_tmdb_api_key(), 'external_source': 'imdb_id'},
             timeout=REQUEST_TIMEOUT
         )
         if resp.status_code != 200:
