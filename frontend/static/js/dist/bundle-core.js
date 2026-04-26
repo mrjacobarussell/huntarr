@@ -1001,7 +1001,7 @@ window.HuntarrVersion = {
     },
 
     loadLatestVersion: function() {
-        HuntarrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/Huntarr.io/releases/latest')
+        HuntarrUtils.fetchWithTimeout('https://api.github.com/repos/mrjacobarussell/huntarr/releases/latest')
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 403) {
@@ -1031,7 +1031,7 @@ window.HuntarrVersion = {
     },
     
     loadBetaVersion: function() {
-        HuntarrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/Huntarr.io/tags?per_page=100')
+        HuntarrUtils.fetchWithTimeout('https://api.github.com/repos/mrjacobarussell/huntarr/tags?per_page=100')
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 403) {
@@ -1101,7 +1101,7 @@ window.HuntarrVersion = {
         // Set loading state
         starsElement.textContent = 'Loading...';
         
-        HuntarrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/Huntarr.io')
+        HuntarrUtils.fetchWithTimeout('https://api.github.com/repos/mrjacobarussell/huntarr')
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 403) {
