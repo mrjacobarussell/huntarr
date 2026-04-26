@@ -18,6 +18,8 @@ Instead, report it privately via one of the following methods:
 - **GitHub Private Vulnerability Reporting:** Use the [Security Advisories](https://github.com/mrjacobarussell/huntarr/security/advisories/new) tab to submit a report confidentially.
 - **Email:** jacobrussell.nremtp@gmail.com
 
+If the vulnerability affects the upstream project, please also report it to the [upstream maintainers](https://github.com/plexguide/Huntarr.io/security/advisories/new).
+
 ### What to include
 
 - A clear description of the vulnerability
