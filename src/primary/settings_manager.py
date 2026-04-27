@@ -11,7 +11,15 @@ import logging
 import hashlib
 import time
 import threading
+import copy
 from typing import Dict, Any, Optional, List
+
+from src.primary.utils.encryption import encrypt_value, decrypt_value, ENCRYPTED_PREFIX
+
+# Sentinel returned in API responses instead of real credentials.
+MASKED_VALUE = "****"
+# Fields treated as secrets — encrypted at rest, masked in API responses.
+_SENSITIVE_KEYS = frozenset(["api_key"])
 
 # SHA-256 hash of the valid Huntarr dev key (constant only; plaintext never stored)
 _DEV_KEY_HASH = "81fc4fcfa6ec4a7a19c9aafe60eea0022ef2c5d05f78484b77cf6578d983f6d3"
@@ -96,6 +104,98 @@ def _ensure_config_exists(app_name: str) -> None:
         settings_logger.error(f"Database error for {app_name}: {e}")
         raise
 
+def _encrypt_credentials(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Return a deep copy of data with api_key fields encrypted for database storage."""
+    data = copy.deepcopy(data)
+    for key in _SENSITIVE_KEYS:
+        if data.get(key):
+            data[key] = encrypt_value(str(data[key]))
+    for inst in data.get("instances", []):
+        if isinstance(inst, dict):
+            for key in _SENSITIVE_KEYS:
+                if inst.get(key):
+                    inst[key] = encrypt_value(str(inst[key]))
+    return data
+
+
+def _decrypt_credentials(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Return a deep copy of data with api_key fields decrypted for in-memory use."""
+    data = copy.deepcopy(data)
+    for key in _SENSITIVE_KEYS:
+        if data.get(key):
+            data[key] = decrypt_value(str(data[key]))
+    for inst in data.get("instances", []):
+        if isinstance(inst, dict):
+            for key in _SENSITIVE_KEYS:
+                if inst.get(key):
+                    inst[key] = decrypt_value(str(inst[key]))
+    return data
+
+
+def _has_plaintext_credentials(data: Dict[str, Any]) -> bool:
+    """Return True if any api_key field is non-empty and not yet encrypted."""
+    for key in _SENSITIVE_KEYS:
+        val = data.get(key, "")
+        if val and not str(val).startswith(ENCRYPTED_PREFIX):
+            return True
+    for inst in data.get("instances", []):
+        if isinstance(inst, dict):
+            for key in _SENSITIVE_KEYS:
+                val = inst.get(key, "")
+                if val and not str(val).startswith(ENCRYPTED_PREFIX):
+                    return True
+    return False
+
+
+def mask_credentials(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Return a deep copy of data with api_key fields replaced by MASKED_VALUE.
+    Use this before returning settings to the API so real keys never leave the server."""
+    data = copy.deepcopy(data)
+    for key in _SENSITIVE_KEYS:
+        if data.get(key):
+            data[key] = MASKED_VALUE
+    for inst in data.get("instances", []):
+        if isinstance(inst, dict):
+            for key in _SENSITIVE_KEYS:
+                if inst.get(key):
+                    inst[key] = MASKED_VALUE
+    return data
+
+
+def resolve_masked_credentials(app_name: str, new_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Replace MASKED_VALUE placeholders in new_data with the real stored values.
+    Call this before save_settings() when the payload comes from the frontend."""
+    new_data = copy.deepcopy(new_data)
+    existing = load_settings(app_name)
+
+    # Top-level api_key
+    for key in _SENSITIVE_KEYS:
+        if new_data.get(key) == MASKED_VALUE:
+            new_data[key] = existing.get(key, "")
+
+    # Per-instance api_key — match by instance_id, fall back to positional index
+    if "instances" in new_data and isinstance(new_data["instances"], list):
+        existing_by_id = {
+            inst.get("instance_id"): inst
+            for inst in existing.get("instances", [])
+            if inst.get("instance_id")
+        }
+        existing_list = existing.get("instances", [])
+        for i, inst in enumerate(new_data["instances"]):
+            if not isinstance(inst, dict):
+                continue
+            for key in _SENSITIVE_KEYS:
+                if inst.get(key) == MASKED_VALUE:
+                    inst_id = inst.get("instance_id")
+                    if inst_id and inst_id in existing_by_id:
+                        inst[key] = existing_by_id[inst_id].get(key, "")
+                    elif i < len(existing_list):
+                        inst[key] = existing_list[i].get(key, "")
+                    else:
+                        inst[key] = ""
+    return new_data
+
+
 def load_settings(app_type, use_cache=True):
     """
     Load settings for a specific app type from database
@@ -162,11 +262,17 @@ def load_settings(app_type, use_cache=True):
             current_settings["hunt_missing_mode"] = "album"
             updated = True
     
-    # If keys were added, save the updated settings
-    if updated:
-        settings_logger.info(f"Added missing default keys to {app_type} settings")
+    # Encrypt any plaintext credentials found in the database (migration path).
+    # On first run after adding encryption, this re-saves with encrypted values.
+    needs_reencrypt = app_type != 'general' and _has_plaintext_credentials(current_settings)
+    if updated or needs_reencrypt:
+        settings_logger.info(f"Persisting updated/migrated settings for {app_type}")
         save_settings(app_type, current_settings)
-    
+
+    # Decrypt credentials so all in-memory consumers get plaintext keys.
+    if app_type != 'general':
+        current_settings = _decrypt_credentials(current_settings)
+
     # Update cache (thread-safe write)
     with _cache_lock:
         _settings_cache[app_type] = {
@@ -288,8 +394,11 @@ def save_settings(app_name: str, settings_data: Dict[str, Any]) -> bool:
             # For app configs, check if instance names have changed and migrate state management data
             if 'instances' in settings_data and isinstance(settings_data['instances'], list):
                 _migrate_instance_state_management_if_needed(app_name, settings_data, db)
-            
-            db.save_app_config(app_name, settings_data)
+
+            # Encrypt credentials before writing to the database.
+            # Already-encrypted values (enc: prefix) are left unchanged.
+            settings_to_store = _encrypt_credentials(settings_data)
+            db.save_app_config(app_name, settings_to_store)
             
         # Auto-save enabled - no need to log every successful save
         success = True

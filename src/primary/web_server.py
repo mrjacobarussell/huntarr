@@ -10,6 +10,7 @@ import time
 from threading import Lock
 from primary.utils.logger import LOG_DIR, APP_LOG_FILES, MAIN_LOG_FILE
 from primary import settings_manager
+from primary.settings_manager import mask_credentials, resolve_masked_credentials, MASKED_VALUE
 from src.primary.stateful_manager import update_lock_expiration
 
 import json
@@ -671,7 +672,6 @@ def user():
 @app.route('/api/settings', methods=['GET'])
 def api_settings():
     if request.method == 'GET':
-        # Return all settings using the new manager function
         all_settings = settings_manager.get_all_settings()
         # Effective timezone (env TZ overrides settings) for logs, scheduling, Hunt Manager display
         try:
@@ -681,7 +681,9 @@ def api_settings():
             all_settings['general']['effective_timezone'] = get_timezone_name()
         except Exception:
             pass
-        return jsonify(all_settings)
+        # Mask credentials before sending to client
+        masked = {app: mask_credentials(cfg) for app, cfg in all_settings.items()}
+        return jsonify(masked)
 
 @app.route('/api/settings/feature-flags', methods=['GET'])
 def api_feature_flags():
@@ -860,37 +862,32 @@ def handle_app_settings(app_name):
         return jsonify({"success": False, "error": f"Unknown application type: {app_name}"}), 400
     
     if request.method == 'GET':
-        # Return settings for the specific app
         app_settings = settings_manager.load_settings(app_name)
-        return jsonify(app_settings)
-    
+        return jsonify(mask_credentials(app_settings))
+
     elif request.method == 'POST':
-        # Make sure we have data
         if not request.is_json:
             return jsonify({"success": False, "error": "Expected JSON data"}), 400
-        
+
         data = request.json
-        # Auto-save request received - debug spam removed
-        
-        # Clean URLs in the data before saving
+
+        # Clean URLs before saving
         if 'instances' in data and isinstance(data['instances'], list):
             for instance in data['instances']:
                 if 'api_url' in instance and instance['api_url']:
-                    # Remove trailing slashes and special characters
                     instance['api_url'] = instance['api_url'].strip().rstrip('/').rstrip('\\')
         elif 'api_url' in data and data['api_url']:
-            # For apps that don't use instances array
             data['api_url'] = data['api_url'].strip().rstrip('/').rstrip('\\')
-        
-        # Settings cleaned - debug spam removed
-        
-        # Save the app settings
+
+        # Replace any masked (****) api_key values with the currently stored keys
+        # so the frontend masking doesn't overwrite real credentials with the placeholder.
+        data = resolve_masked_credentials(app_name, data)
+
         success = settings_manager.save_settings(app_name, data)
-        
+
         if success:
-            # Return updated settings so client can show server-generated fields (e.g. instance_id for new instances)
             updated = settings_manager.load_settings(app_name)
-            return jsonify({"success": True, "settings": updated})
+            return jsonify({"success": True, "settings": mask_credentials(updated)})
         else:
             web_logger.error(f"Failed to save {app_name} settings")
             return jsonify({"success": False, "error": f"Failed to save {app_name} settings"}), 500
@@ -927,9 +924,9 @@ def api_reset_settings():
     success = settings_manager.save_settings(app_name, default_settings) # Corrected function name
 
     if success:
-        # Return the full updated config after reset
-        all_settings = settings_manager.get_all_settings() # Corrected function name
-        return jsonify(all_settings)
+        all_settings = settings_manager.get_all_settings()
+        masked = {app: mask_credentials(cfg) for app, cfg in all_settings.items()}
+        return jsonify(masked)
     else:
         return jsonify({"success": False, "error": f"Failed to save reset settings for {app_name}"}), 500
 
@@ -943,7 +940,7 @@ def api_app_settings():
     # api_details = settings_manager.get_api_details(app_type) # Function does not exist
     api_url = settings_manager.get_api_url(app_type)
     api_key = settings_manager.get_api_key(app_type)
-    api_details = {"api_url": api_url, "api_key": api_key}
+    api_details = {"api_url": api_url, "api_key": MASKED_VALUE if api_key else ""}
     return jsonify({"success": True, **api_details})
 
 @app.route('/api/configured-apps', methods=['GET'])
