@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>huntarr-revisited</Name>
+  <Repository>mrjacobarussell/huntarr-revisited</Repository>
+  <Registry>https://hub.docker.com/r/mrjacobarussell/huntarr-revisited</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/mrjacobarussell/huntarr/issues</Support>
+  <Project>https://github.com/mrjacobarussell/huntarr</Project>
+  <Overview>Huntarr Revisited — Automated missing-media discovery and quality-upgrade tool for your *arr stack (Sonarr, Radarr, Lidarr, Readarr, Prowlarr and more). Fork maintained by MrJacobarussell.</Overview>
+  <Category>MediaApp: Video MediaApp: Music MediaApp: Books Tools:</Category>
+  <WebUI>http://[IP]:[PORT:9705]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/mrjacobarussell/huntarr/main/templates/huntarr-revisited.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/mrjacobarussell/huntarr/main/frontend/static/logo/256.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText>Buy Me a Coffee</DonateText>
+  <DonateLink>https://buymeacoffee.com/jacobrussell_medic</DonateLink>
+  <Requires/>
+
+  <Config Name="WebUI Port" Target="9705" Default="9705" Mode="tcp" Description="Web interface port for Huntarr Revisited." Type="Port" Display="always" Required="true" Mask="false">9705</Config>
+
+  <Config Name="Config Storage" Target="/config" Default="/mnt/user/appdata/huntarr-revisited" Mode="rw" Description="Persistent storage for Huntarr Revisited settings, database, and logs." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/huntarr-revisited</Config>
+
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID that the container process runs as. Unraid default: 99." Type="Variable" Display="always" Required="false" Mask="false">99</Config>
+
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID that the container process runs as. Unraid default: 100." Type="Variable" Display="always" Required="false" Mask="false">100</Config>
+
+  <Config Name="Timezone" Target="TZ" Default="America/New_York" Mode="" Description="Timezone for the container. Example: America/New_York, Europe/London, UTC." Type="Variable" Display="always" Required="false" Mask="false">America/New_York</Config>
+
+</Container>
