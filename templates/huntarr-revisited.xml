@@ -30,6 +30,6 @@
 
   <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID that the container process runs as. Unraid default: 100." Type="Variable" Display="always" Required="false" Mask="false">100</Config>
 
-  <Config Name="Timezone" Target="TZ" Default="America/New_York" Mode="" Description="Timezone for the container. Example: America/New_York, Europe/London, UTC." Type="Variable" Display="always" Required="false" Mask="false">America/New_York</Config>
+  <Config Name="Timezone" Target="/etc/localtime" Default="/etc/localtime" Mode="ro" Description="Inherit timezone from Unraid host automatically. Set your timezone in Unraid Settings → Date and Time." Type="Path" Display="advanced" Required="false" Mask="false">/etc/localtime</Config>
 
 </Container>
