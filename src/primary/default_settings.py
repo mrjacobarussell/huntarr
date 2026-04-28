@@ -327,7 +327,6 @@ def get_default_config(app_type: str) -> Dict[str, Any]:
         'readarr': READARR_DEFAULTS,
         'whisparr': WHISPARR_DEFAULTS,
         'eros': EROS_DEFAULTS,
-        'prowlarr': PROWLARR_DEFAULTS,
         'swaparr': SWAPARR_DEFAULTS,
         'general': GENERAL_DEFAULTS
     }
@@ -378,4 +377,4 @@ def get_tv_hunt_instance_settings_defaults() -> Dict[str, Any]:
 
 def get_all_app_types() -> list:
     """Get list of all supported app types."""
-    return ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'swaparr', 'prowlarr', 'general']
+    return ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'swaparr', 'general']
