@@ -114,14 +114,6 @@ const huntManagerModule = {
                     window.huntarrUI.switchSection('apps');
                     window.location.hash = '#apps';
                     console.log(`Navigated to apps section for ${appType}`);
-                } else if (appType === 'movie_hunt' && window.huntarrUI) {
-                    window.huntarrUI.switchSection('movie-hunt-home');
-                    window.location.hash = '#movie-hunt-home';
-                    console.log('Navigated to Movie Hunt');
-                } else if (appType === 'tv_hunt' && window.huntarrUI) {
-                    window.huntarrUI.switchSection('tv-hunt-collection');
-                    window.location.hash = '#tv-hunt-collection';
-                    console.log('Navigated to TV Hunt');
                 } else {
                     console.log(`Clicking disabled for ${appType}`);
                 }
@@ -138,7 +130,7 @@ const huntManagerModule = {
     
     // Clear hunt history
     clearHuntHistory: function() {
-        const appDisplayNames = { movie_hunt: 'Movie Hunt', tv_hunt: 'TV Hunt', sonarr: 'Sonarr', radarr: 'Radarr', lidarr: 'Lidarr', readarr: 'Readarr', whisparr: 'Whisparr V2', eros: 'Whisparr V3' };
+        const appDisplayNames = { sonarr: 'Sonarr', radarr: 'Radarr', lidarr: 'Lidarr', readarr: 'Readarr', whisparr: 'Whisparr V2', eros: 'Whisparr V3' };
         const appName = this.currentApp === 'all' ? 'all apps' : (appDisplayNames[this.currentApp] || this.currentApp);
         const msg = `Are you sure you want to clear hunt history for ${appName}? This action cannot be undone.`;
         const self = this;
@@ -263,7 +255,7 @@ const huntManagerModule = {
         // App instance (formatted as "App Name (Instance Name)")
         const instanceCell = document.createElement('td');
         instanceCell.className = 'col-instance';
-        const appDisplayNames = { whisparr: 'Whisparr V2', eros: 'Whisparr V3', movie_hunt: 'Movie Hunt', tv_hunt: 'TV Hunt' };
+        const appDisplayNames = { whisparr: 'Whisparr V2', eros: 'Whisparr V3' };
         const appName = appDisplayNames[entry.app_type] || (entry.app_type.charAt(0).toUpperCase() + entry.app_type.slice(1).replace(/_/g, ' '));
         instanceCell.textContent = `${appName} (${entry.instance_name || 'Default'})`;
         
@@ -283,19 +275,14 @@ const huntManagerModule = {
     
     // Format processed info
     formatProcessedInfo: function(entry) {
-        // Sonarr, Radarr, Lidarr: clickable to open in *arr app; Movie Hunt / TV Hunt: clickable to go to section
         const isArrClickable = (entry.app_type === 'sonarr' || entry.app_type === 'radarr' || entry.app_type === 'lidarr') && entry.instance_name;
-        const isMovieHuntClickable = entry.app_type === 'movie_hunt';
-        const isTVHuntClickable = entry.app_type === 'tv_hunt';
-        const isClickable = isArrClickable || isMovieHuntClickable || isTVHuntClickable;
+        const isClickable = isArrClickable;
         const escapeAttr = (s) => { if (s == null) return ''; return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
         const dataAttributes = isClickable ?
             `data-app="${escapeAttr(entry.app_type)}" data-instance="${escapeAttr(entry.instance_name || '')}" data-item-id="${escapeAttr(entry.media_id || '')}"` :
             `data-app="${escapeAttr(entry.app_type)}"`;
         let title = `${entry.app_type} (${entry.instance_name || 'Default'})`;
         if (isArrClickable) title = `Click to open in ${entry.app_type} (${entry.instance_name})`;
-        else if (isMovieHuntClickable) title = 'Click to open Movie Hunt';
-        else if (isTVHuntClickable) title = 'Click to open TV Hunt';
 
         const linkClass = isClickable ? 'hunt-item-link' : '';
         const titleAttr = title.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

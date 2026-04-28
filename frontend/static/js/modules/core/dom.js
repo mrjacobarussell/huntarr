@@ -48,8 +48,6 @@ window.HuntarrDOM = {
         elements.readarrHomeStatus = document.getElementById('readarrHomeStatus');
         elements.whisparrHomeStatus = document.getElementById('whisparrHomeStatus');
         elements.erosHomeStatus = document.getElementById('erosHomeStatus');
-        elements.movie_huntHomeStatus = document.getElementById('movie_huntHomeStatus');
-        
         // Actions
         elements.startHuntButton = document.getElementById('startHuntButton');
         elements.stopHuntButton = document.getElementById('stopHuntButton');
