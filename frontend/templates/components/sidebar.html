@@ -66,16 +66,11 @@
             </div>
         </div>
 
-        <!-- ── APPS label header ───────────────────────────────── -->
-        <div class="nav-group" id="nav-group-apps-label">
-            <div class="nav-group-title">Apps</div>
-        </div>
-
-        <!-- ── 3RD PARTY APPS ─────────────────────────────────── -->
+        <!-- ── APPS ───────────────────────────────────────────── -->
         <div class="nav-group" id="nav-group-apps">
             <div class="nav-group-header" data-group="sidebar-group-apps">
                 <i class="fas fa-th-large nav-group-icon"></i>
-                <span>3rd Party Apps</span>
+                <span>Apps</span>
                 <i class="fas fa-chevron-right nav-group-chevron"></i>
             </div>
             <div class="nav-group-body collapsed" id="sidebar-group-apps">
@@ -297,10 +292,8 @@ function setActiveNavItem() {
             .then(function(r) { return r.json(); })
             .then(function(flags) {
                 var appsGroup = document.getElementById('nav-group-apps');
-                var appsLabel = document.getElementById('nav-group-apps-label');
                 var hideApps = flags.enable_third_party_apps === false;
                 if (appsGroup) appsGroup.style.display = hideApps ? 'none' : '';
-                if (appsLabel) appsLabel.style.display = hideApps ? 'none' : '';
             })
             .catch(function() { /* keep defaults visible on error */ });
     }
