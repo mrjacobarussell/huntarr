@@ -46,59 +46,6 @@
             </div>
         </div>
 
-        <div class="card requestarr-home-card">
-            <div class="requestarr-home-content">
-                <div class="global-search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="home-requestarr-search-input" placeholder="Search Movies & TV" autocomplete="off">
-                </div>
-
-                <!-- Instance Selectors (same server-side defaults as Requestarr) -->
-                <div class="home-instance-controls" id="home-instance-controls" style="display: none;">
-                    <div class="instance-selector-container">
-                        <select id="home-movie-instance-select" class="control-select instance-select">
-                            <option value="">Loading movie instances...</option>
-                        </select>
-                    </div>
-                    <div class="instance-selector-container">
-                        <select id="home-tv-instance-select" class="control-select instance-select">
-                            <option value="">Loading TV instances...</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="home-search-results-view" style="display: none;">
-                    <h2 class="search-results-title">Search Results</h2>
-                    <div id="home-search-results-grid">
-                        <!-- Search results will be populated here -->
-                    </div>
-                </div>
-
-                <div id="home-requestarr-discover-view" style="display: none;">
-                    <!-- Smart Hunt Section (replaces rotating Trending/Movies/TV) -->
-                    <section class="carousel-section" id="home-smarthunt-section">
-                        <div class="section-title-container">
-                            <h2 class="section-title">Smart Hunt <span class="fire-emoji smarthunt-flame">🔥</span></h2>
-                        </div>
-                        <div class="trending-bar"></div>
-                        <div class="carousel-container">
-                            <button class="carousel-arrow left" data-target="home-smarthunt-carousel">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div id="home-smarthunt-carousel" class="media-carousel">
-                                <div class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <p>Loading Smart Hunt...</p>
-                                </div>
-                            </div>
-                            <button class="carousel-arrow right" data-target="home-smarthunt-carousel">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
         <!-- Hunt Activity -->
         <div class="card stats-card">
             <div class="home-section-bar">
