@@ -12,8 +12,6 @@ window.HuntarrStats = {
 
     // App metadata: order, display names, icons, accent colors
     APP_META: {
-        tv_hunt:    { label: 'TV Hunt',    icon: './static/logo/256.png', accent: '#a855f7' },
-        movie_hunt: { label: 'Movie Hunt', icon: './static/logo/256.png', accent: '#f59e0b' },
         sonarr:     { label: 'Sonarr',     icon: './static/images/app-icons/sonarr.png', accent: '#6366f1' },
         radarr:     { label: 'Radarr',     icon: './static/images/app-icons/radarr.png', accent: '#f59e0b' },
         lidarr:     { label: 'Lidarr',     icon: './static/images/app-icons/lidarr.png', accent: '#22c55e' },
@@ -21,7 +19,7 @@ window.HuntarrStats = {
         whisparr:   { label: 'Whisparr V2', icon: './static/images/app-icons/whisparr.png', accent: '#ec4899' },
         eros:       { label: 'Whisparr V3', icon: './static/images/app-icons/whisparr.png', accent: '#ec4899' }
     },
-    DEFAULT_APP_ORDER: ['tv_hunt', 'movie_hunt', 'sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros'],
+    DEFAULT_APP_ORDER: ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros'],
 
     // ─── Polling ──────────────────────────────────────────────────────
     startPolling: function() {

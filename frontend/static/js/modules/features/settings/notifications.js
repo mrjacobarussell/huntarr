@@ -44,8 +44,6 @@
     // App type display info
     var APP_TYPES = [
         { key: 'all', label: 'All Apps', icon: 'fas fa-layer-group', color: '#818cf8' },
-        { key: 'movie_hunt', label: 'Movie Hunt', icon: 'fas fa-film', color: '#f59e0b' },
-        { key: 'tv_hunt', label: 'TV Hunt', icon: 'fas fa-tv', color: '#0ea5e9' },
         { key: 'sonarr', label: 'Sonarr', icon: 'fas fa-tv', color: '#60a5fa' },
         { key: 'radarr', label: 'Radarr', icon: 'fas fa-video', color: '#f97316' },
         { key: 'lidarr', label: 'Lidarr', icon: 'fas fa-music', color: '#34d399' },
