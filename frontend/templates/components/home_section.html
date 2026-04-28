@@ -75,13 +75,9 @@
                     </div>
                     <p style="font-size: 18px; margin-bottom: 10px; font-weight: 500; color: #e2e8f0;">No Instances Configured</p>
                     <p style="font-size: 14px; line-height: 1.6; opacity: 0.8; max-width: 400px; margin-bottom: 20px;">
-                        Get started by heading to Media Hunt or configure your 3rd Party Apps.
+                        Get started by configuring your 3rd Party Apps.
                     </p>
                     <div style="display: flex; gap: 12px; align-items: center;">
-                        <button onclick="window.location.hash = '#media-hunt-collection'" class="action-button" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); color: #818cf8; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                            <i class="fas fa-rocket" style="margin-right: 8px;"></i> Media Hunt
-                        </button>
-                        <span style="color: #64748b; font-size: 14px;">or</span>
                         <button onclick="window.location.hash = '#sonarr'" class="action-button" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); color: #818cf8; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">
                             <i class="fas fa-th-large" style="margin-right: 8px;"></i> 3rd Party Apps
                         </button>
@@ -89,45 +85,6 @@
                 </div>
 
                 <div class="app-stats-grid" id="app-stats-grid">
-                    <!-- Movie Hunt Card (first: Huntarr Revisited icon, so users see Movie Hunt upfront) -->
-                    <div class="app-stats-card movie_hunt" style="display: none;">
-                        <div class="status-container" style="display: none;">
-                            <span id="movie_huntHomeStatus" class="status-badge"></span>
-                        </div>
-                        <div class="hourly-cap-container">
-                            <div class="hourly-cap-status" id="movie_hunt-hourly-cap">
-                                <span class="hourly-cap-icon" id="movie_hunt-cap-icon"></span>
-                                <span class="hourly-cap-text">API: <span id="movie_hunt-api-count">0</span> / <span id="movie_hunt-api-limit">—</span></span>
-                            </div>
-                            <div class="api-progress-container">
-                                <div class="api-progress-bar">
-                                    <div class="api-progress-fill" id="movie_hunt-api-progress" style="width: 0%;"></div>
-                                </div>
-                                <div class="api-progress-text">
-                                    API: <span id="movie_hunt-api-used">0</span> / <span id="movie_hunt-api-total">—</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="app-content">
-                            <div class="app-icon-wrapper">
-                                <img src="./static/logo/256.png" alt="Movie" class="app-logo" title="Movie">
-                            </div>
-                            <h4>Movie</h4>
-                        </div>
-                        <div class="stats-numbers">
-                            <div class="stat-box">
-                                <span class="stat-number" id="movie_hunt-hunted">0</span>
-                                <span class="stat-label">Searches Triggered</span>
-                            </div>
-                            <div class="stat-box">
-                                <span class="stat-number" id="movie_hunt-upgraded">0</span>
-                                <span class="stat-label">Upgrades Triggered</span>
-                            </div>
-                        </div>
-                        <div class="reset-button-container">
-                            <button class="cycle-reset-button" data-app="movie_hunt"><i class="fas fa-sync-alt"></i> Reset</button>
-                        </div>
-                    </div>
                     <!-- Sonarr Card -->
                     <div class="app-stats-card sonarr" style="display: none;">
                         <div class="status-container" style="display: none;">
@@ -923,19 +880,6 @@
     .app-stats-card.eros .app-icon-wrapper::after {
         border-color: rgba(195, 0, 230, 0.4);
         box-shadow: 0 0 20px rgba(195, 0, 230, 0.3);
-    }
-    
-    /* Movie Hunt & TV Hunt amber/gold glowing rings (Huntarr Revisited branding) */
-    .app-stats-card.movie_hunt .app-icon-wrapper::before,
-    .app-stats-card.tv_hunt .app-icon-wrapper::before {
-        border-color: rgba(245, 158, 11, 0.8);
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
-    }
-    
-    .app-stats-card.movie_hunt .app-icon-wrapper::after,
-    .app-stats-card.tv_hunt .app-icon-wrapper::after {
-        border-color: rgba(245, 158, 11, 0.4);
-        box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
     }
     
     .app-logo {
