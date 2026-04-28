@@ -36,7 +36,7 @@ from src.primary.routes.common import common_bp
 from src.primary.routes.media_hunt import movie_hunt_bp, tv_hunt_bp
 from src.primary.routes.plex_auth_routes import plex_auth_bp
 # Import blueprints for each app from the centralized blueprints module
-from src.primary.apps.blueprints import sonarr_bp, radarr_bp, lidarr_bp, readarr_bp, whisparr_bp, eros_bp, swaparr_bp, requestarr_bp, prowlarr_bp
+from src.primary.apps.blueprints import sonarr_bp, radarr_bp, lidarr_bp, readarr_bp, whisparr_bp, eros_bp, swaparr_bp, prowlarr_bp
 
 # Import stateful blueprint
 from src.primary.stateful_routes import stateful_api
@@ -55,7 +55,6 @@ from src.routes.backup_routes import backup_bp
 
 # Import log routes blueprint
 from src.primary.routes.log_routes import log_routes_bp
-from src.primary.routes.nzb_hunt_routes import nzb_hunt_bp
 from src.primary.routes.indexer_hunt import indexer_hunt_bp
 from src.primary.routes.indexer_hunt.health import start_health_check_thread
 
@@ -313,13 +312,11 @@ app.register_blueprint(whisparr_bp, url_prefix='/api/whisparr')
 app.register_blueprint(eros_bp, url_prefix='/api/eros')
 app.register_blueprint(swaparr_bp, url_prefix='/api/swaparr')
 app.register_blueprint(prowlarr_bp, url_prefix='/api/prowlarr')
-app.register_blueprint(requestarr_bp)
 app.register_blueprint(stateful_api, url_prefix='/api/stateful')
 app.register_blueprint(history_blueprint, url_prefix='/api/hunt-manager')
 app.register_blueprint(scheduler_api)
 app.register_blueprint(notification_api)
 app.register_blueprint(log_routes_bp)
-app.register_blueprint(nzb_hunt_bp)
 app.register_blueprint(indexer_hunt_bp)
 app.register_blueprint(backup_bp)
 
@@ -690,7 +687,6 @@ def api_feature_flags():
     """Return lightweight feature flag settings for sidebar visibility."""
     general = settings_manager.load_settings('general') or {}
     return jsonify({
-        'enable_requestarr': general.get('enable_requestarr', True),
         'enable_media_hunt': general.get('enable_media_hunt', True),
         'enable_third_party_apps': general.get('enable_third_party_apps', True),
     })
