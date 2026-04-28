@@ -46,11 +46,11 @@ swaparr_thread = None
 prowlarr_stats_thread = None
 
 # Define which apps have background processing cycles
-CYCLICAL_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "movie_hunt", "tv_hunt"]
+CYCLICAL_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]
 
 # Apps that schedule each instance on its own interval (only run an instance when its next_cycle_time is due)
 # All cyclical *arr apps use per-instance scheduling for true independent timing.
-PER_INSTANCE_SCHEDULING_APP_TYPES = {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "movie_hunt", "tv_hunt"}
+PER_INSTANCE_SCHEDULING_APP_TYPES = {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"}
 
 # Instance list generator has been removed
 

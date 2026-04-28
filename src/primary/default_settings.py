@@ -274,7 +274,6 @@ GENERAL_DEFAULTS = {
     "log_refresh_interval_seconds": 30,
     "ui_theme": "dark",
     "check_for_updates": True,
-    "enable_media_hunt": True,
     "enable_third_party_apps": True,
     "show_trending": True,
     "low_usage_mode": True,
@@ -330,8 +329,6 @@ def get_default_config(app_type: str) -> Dict[str, Any]:
         'eros': EROS_DEFAULTS,
         'prowlarr': PROWLARR_DEFAULTS,
         'swaparr': SWAPARR_DEFAULTS,
-        'movie_hunt': MOVIE_HUNT_DEFAULTS,
-        'tv_hunt': TV_HUNT_DEFAULTS,
         'general': GENERAL_DEFAULTS
     }
     

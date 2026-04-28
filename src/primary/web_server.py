@@ -33,7 +33,6 @@ from src.primary.auth import (
 )
 # Import blueprint for common routes
 from src.primary.routes.common import common_bp
-from src.primary.routes.media_hunt import movie_hunt_bp, tv_hunt_bp
 from src.primary.routes.plex_auth_routes import plex_auth_bp
 # Import blueprints for each app from the centralized blueprints module
 from src.primary.apps.blueprints import sonarr_bp, radarr_bp, lidarr_bp, readarr_bp, whisparr_bp, eros_bp, swaparr_bp, prowlarr_bp
@@ -55,8 +54,6 @@ from src.routes.backup_routes import backup_bp
 
 # Import log routes blueprint
 from src.primary.routes.log_routes import log_routes_bp
-from src.primary.routes.indexer_hunt import indexer_hunt_bp
-from src.primary.routes.indexer_hunt.health import start_health_check_thread
 
 # Import background module to trigger manual cycle resets
 from src.primary import background
@@ -301,8 +298,6 @@ app.secret_key = _get_or_create_secret_key()
 
 # Register blueprints
 app.register_blueprint(common_bp)
-app.register_blueprint(movie_hunt_bp)
-app.register_blueprint(tv_hunt_bp)
 app.register_blueprint(plex_auth_bp)
 app.register_blueprint(sonarr_bp, url_prefix='/api/sonarr')
 app.register_blueprint(radarr_bp, url_prefix='/api/radarr')
@@ -317,11 +312,7 @@ app.register_blueprint(history_blueprint, url_prefix='/api/hunt-manager')
 app.register_blueprint(scheduler_api)
 app.register_blueprint(notification_api)
 app.register_blueprint(log_routes_bp)
-app.register_blueprint(indexer_hunt_bp)
 app.register_blueprint(backup_bp)
-
-# Start Indexer Hunt background health check (hourly + on startup)
-start_health_check_thread()
 
 # Register the authentication check to run before requests
 app.before_request(authenticate_request)
@@ -687,7 +678,6 @@ def api_feature_flags():
     """Return lightweight feature flag settings for sidebar visibility."""
     general = settings_manager.load_settings('general') or {}
     return jsonify({
-        'enable_media_hunt': general.get('enable_media_hunt', True),
         'enable_third_party_apps': general.get('enable_third_party_apps', True),
     })
 
@@ -961,7 +951,7 @@ def api_app_status(app_name):
         return jsonify({"configured": False, "connected": False, "error": "Invalid app name"}), 400
     
     try:
-        if app_name in ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'movie_hunt', 'tv_hunt']:
+        if app_name in ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros']:
             # --- Multi-Instance Status Check --- # 
             connected_count = 0
             total_configured = 0
@@ -1187,7 +1177,7 @@ def reset_app_cycle(app_name):
     web_logger.info(f"Manual cycle reset requested for {app_name} via API")
     
     # Check if app name is valid
-    if app_name not in ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'swaparr', 'movie_hunt', 'tv_hunt']:
+    if app_name not in ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'swaparr']:
         return jsonify({
             'success': False,
             'error': f"Invalid app name: {app_name}"
