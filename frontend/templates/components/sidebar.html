@@ -508,8 +508,9 @@ function setActiveNavItem() {
     }
 
     // Expand the correct group (accordion)
+    // When no group owns this hash (e.g. #home), leave groups as-is rather than
+    // collapsing everything — collapsing made the sidebar appear to disappear.
     if (group) { expandSidebarGroup(group); }
-    else { collapseAllGroups(); }
 
     // Highlight active item
     if (selector) {
