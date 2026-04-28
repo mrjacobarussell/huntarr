@@ -773,10 +773,6 @@ window.SettingsForms = {
                 timezone: getVal('timezone', 'UTC'),
                 display_community_resources: getVal('display_community_resources', true),
                 display_huntarr_support: getVal('display_huntarr_support', true),
-                enable_requestarr: true, // Always enabled (required for Movie Hunt)
-
-                show_trending: getVal('show_trending', true),
-                show_nzb_hunt_on_home: getVal('show_nzb_hunt_on_home', false),
                 tmdb_image_cache_days: parseInt(container.querySelector('#tmdb_image_cache_days')?.value || '30'),
                 auth_mode: (container.querySelector('#auth_mode') && container.querySelector('#auth_mode').value) || 'login',
                 ssl_verify: getVal('ssl_verify', true),
@@ -845,11 +841,6 @@ window.SettingsForms = {
             settings.timezone = getInputValue("#timezone", "UTC");
             settings.display_community_resources = getInputValue("#display_community_resources", true);
             settings.display_huntarr_support = getInputValue("#display_huntarr_support", true);
-            settings.enable_requestarr = true; // Always enabled (required for Movie Hunt)
-
-            settings.show_trending = getInputValue("#show_trending", true);
-            settings.enable_smarthunt = getInputValue("#enable_smarthunt", true);
-
             const authMode = container.querySelector("#auth_mode")?.value || "login";
             settings.auth_mode = authMode;
             settings.ssl_verify = getInputValue("#ssl_verify", true);
@@ -863,9 +854,6 @@ window.SettingsForms = {
                     settings.frame_ancestors = faSel.value;
                 }
             }
-            settings.enable_requestarr = !getInputValue("#disable_requests", false);
-            settings.enable_media_hunt = !getInputValue("#disable_media_hunt", false);
-            settings.enable_third_party_apps = !getInputValue("#disable_third_party_apps", false);
             settings.base_url = getInputValue("#base_url", "");
             settings.dev_key = getInputValue("#dev_key", "");
 
@@ -14619,56 +14607,6 @@ document.head.appendChild(styleEl);
                             </select>
                             <p class="setting-help">Cache TMDB images to reduce load times and API usage. Missing images will still attempt to load.</p>
                         </div>
-                        <div class="setting-item flex-row" style="margin-top: 15px;" id="show_trending_setting_item">
-                            <label for="show_trending">Show Smart Hunt on Home:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="show_trending" ${settings.show_trending !== false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">Display the Smart Hunt carousel on the Home page. Configure mix settings in Requestarr &gt; Smart Hunt.</p>
-                        <div class="setting-item flex-row" style="margin-top: 15px;">
-                            <label for="show_nzb_hunt_on_home">Show NZB Hunt on Home:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="show_nzb_hunt_on_home" ${settings.show_nzb_hunt_on_home === true ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">Display the NZB Hunt status bar on the Home page with live speed, connections, and ETA when servers are configured.</p>
-                    </div>
-                </div>
-
-                <!-- Huntarr Operations card -->
-                <div class="mset-card">
-                    <div class="mset-card-header">
-                        <div class="mset-card-icon mset-icon-blue"><i class="fas fa-cogs"></i></div>
-                        <h3>Huntarr Operations</h3>
-                    </div>
-                    <div class="mset-card-body">
-                        <div class="setting-item flex-row">
-                            <label for="disable_requests">Disable Requests:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="disable_requests" ${settings.enable_requestarr === false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">When enabled, the Requests section (Discover, TV Shows, Movies, etc.) is fully off—no UI, logging, or background work. Saves compute.</p>
-                        <div class="setting-item flex-row" style="margin-top: 15px;">
-                            <label for="disable_media_hunt">Disable Media Hunt &amp; NZB Hunt:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="disable_media_hunt" ${settings.enable_media_hunt === false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">When enabled, Media Hunt, NZB Hunt, and Index Master are fully off—no UI, logging, or background work. Saves compute.</p>
-                        <div class="setting-item flex-row" style="margin-top: 15px;">
-                            <label for="disable_third_party_apps">Disable 3rd Party Apps:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="disable_third_party_apps" ${settings.enable_third_party_apps === false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">When enabled, 3rd Party Apps (Sonarr, Radarr, etc.) are fully off—no UI, logging, or hunt cycles. Saves compute.</p>
                     </div>
                 </div>
 
@@ -14900,31 +14838,12 @@ document.head.appendChild(styleEl);
             window.SettingsForms.saveAppSettings("general", settings, "Settings saved successfully", { section: "main" })
                 .then(function() {
                     if (window.huntarrUI) {
-                        window.huntarrUI._enableRequestarr = settings.enable_requestarr !== false;
-                        window.huntarrUI._enableMediaHunt = settings.enable_media_hunt !== false;
                         window.huntarrUI._enableThirdPartyApps = settings.enable_third_party_apps !== false;
                     }
-                    // Update sidebar visibility immediately from saved settings (don't rely on async fetch)
-                    var requestsGroup = document.getElementById('nav-group-requests');
-                    var mediaHuntGroup = document.getElementById('nav-group-media-hunt');
-                    var nzbHuntGroup = document.getElementById('nzb-hunt-sidebar-group');
-                    var appsGroup = document.getElementById('nav-group-apps');
-                    var appsLabel = document.getElementById('nav-group-apps-label');
-                    if (requestsGroup) requestsGroup.style.display = (settings.enable_requestarr === false) ? 'none' : '';
-                    if (mediaHuntGroup) mediaHuntGroup.style.display = (settings.enable_media_hunt === false) ? 'none' : '';
-                    if (nzbHuntGroup) nzbHuntGroup.style.display = (settings.enable_media_hunt === false) ? 'none' : '';
-                    if (appsGroup) appsGroup.style.display = (settings.enable_third_party_apps === false) ? 'none' : '';
-                    if (appsLabel) appsLabel.style.display = (settings.enable_media_hunt === false && settings.enable_third_party_apps === false) ? 'none' : '';
                     if (typeof window.applyFeatureFlags === 'function') window.applyFeatureFlags();
-                    if (window.HomeRequestarr && typeof window.HomeRequestarr.applyTrendingVisibility === 'function') {
-                        window.HomeRequestarr.applyTrendingVisibility();
-                    }
                     if (window.huntarrUI && window.huntarrUI.currentSection === 'home') {
                         if (window.HuntarrStats && typeof window.HuntarrStats.loadMediaStats === 'function') {
                             window.HuntarrStats.loadMediaStats(true);
-                        }
-                        if (window.HuntarrIndexerHuntHome && typeof window.HuntarrIndexerHuntHome.load === 'function') {
-                            window.HuntarrIndexerHuntHome.load();
                         }
                     }
                 }).catch(function() {});

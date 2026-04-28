@@ -160,72 +160,8 @@
                 </div>
             </div>
 
-            <!-- Plex Account card -->
-            <div class="mset-card">
-                <div class="mset-card-header">
-                    <div class="mset-card-icon uset-icon-orange"><i class="fas fa-tv"></i></div>
-                    <h3>Plex Account</h3>
-                </div>
-                <div class="mset-card-body">
-                    <div class="form-group">
-                        <label>Status:</label>
-                        <span id="plexAccountStatus" class="status-badge" style="display: none;">Loading...</span>
-                    </div>
-                    <div id="plexNotLinkedSection" style="display: none;">
-                        <p class="help-text">Link your Plex account to enable Plex login and additional features.</p>
-                        <div class="form-actions">
-                            <button id="linkPlexAccount" class="action-button primary-button">
-                                <i class="fas fa-link"></i> Link Plex Account
-                            </button>
-                        </div>
-                        <div id="plexMainPageStatus" class="status-message" style="display: none;"></div>
-                    </div>
-                    <div id="plexLinkedSection" style="display: none;">
-                        <div class="form-group">
-                            <label>Plex Username:</label>
-                            <span id="plexUsername" class="current-value"></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Plex Email:</label>
-                            <span id="plexEmail" class="current-value"></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Linked At:</label>
-                            <span id="plexLinkedAt" class="current-value"></span>
-                        </div>
-                        <div class="form-actions">
-                            <button id="unlinkPlexAccount" class="action-button danger-button">
-                                <i class="fas fa-unlink"></i> Unlink Plex Account
-                            </button>
-                        </div>
-                        <div id="plexUnlinkStatus" class="status-message" style="display: none;"></div>
-                    </div>
-                </div>
-            </div>
-
         </div>
         </div>
     </div>
 </section>
 
-<!-- Plex Link Modal -->
-<div class="modal" id="plexLinkModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);">
-    <div class="modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(180deg, rgba(22, 26, 34, 0.98), rgba(18, 22, 30, 0.95)); border-radius: 15px; padding: 30px; width: 400px; max-width: 90%; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); border: 1px solid rgba(90, 109, 137, 0.15); color: #f8f9fa;">
-        <div class="modal-header" style="text-align: center; margin-bottom: 20px;">
-            <div style="font-size: 40px; color: #e69500; margin-bottom: 10px;">
-                <i class="fas fa-tv"></i>
-            </div>
-            <h2>Link Plex Account</h2>
-        </div>
-        <div class="plex-pin-display" style="background: rgba(90, 109, 137, 0.1); border: 2px solid rgba(204, 123, 25, 0.5); border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0;">
-            <p>PIN Code:</p>
-            <p id="plexLinkPinCode" style="font-size: 13px; font-weight: bold; color: #e69500; letter-spacing: 2px; margin: 10px 0; word-wrap: break-word; word-break: break-all; line-height: 1.4;"></p>
-        </div>
-        <div class="plex-status waiting" id="plexLinkStatus" style="margin: 15px 0; padding: 10px; border-radius: 8px; text-align: center; background: rgba(255, 193, 7, 0.2); border: 1px solid rgba(255, 193, 7, 0.3); color: #ffc107; display: block;">
-            <i class="fas fa-hourglass-half"></i> Initializing Plex authentication...
-        </div>
-        <div class="modal-actions" style="text-align: center; margin-top: 20px;">
-            <button id="cancelPlexLink" class="action-button secondary-button">Cancel</button>
-        </div>
-    </div>
-</div>

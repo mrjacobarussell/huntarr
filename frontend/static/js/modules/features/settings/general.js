@@ -106,56 +106,6 @@
                             </select>
                             <p class="setting-help">Cache TMDB images to reduce load times and API usage. Missing images will still attempt to load.</p>
                         </div>
-                        <div class="setting-item flex-row" style="margin-top: 15px;" id="show_trending_setting_item">
-                            <label for="show_trending">Show Smart Hunt on Home:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="show_trending" ${settings.show_trending !== false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">Display the Smart Hunt carousel on the Home page. Configure mix settings in Requestarr &gt; Smart Hunt.</p>
-                        <div class="setting-item flex-row" style="margin-top: 15px;">
-                            <label for="show_nzb_hunt_on_home">Show NZB Hunt on Home:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="show_nzb_hunt_on_home" ${settings.show_nzb_hunt_on_home === true ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">Display the NZB Hunt status bar on the Home page with live speed, connections, and ETA when servers are configured.</p>
-                    </div>
-                </div>
-
-                <!-- Huntarr Operations card -->
-                <div class="mset-card">
-                    <div class="mset-card-header">
-                        <div class="mset-card-icon mset-icon-blue"><i class="fas fa-cogs"></i></div>
-                        <h3>Huntarr Operations</h3>
-                    </div>
-                    <div class="mset-card-body">
-                        <div class="setting-item flex-row">
-                            <label for="disable_requests">Disable Requests:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="disable_requests" ${settings.enable_requestarr === false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">When enabled, the Requests section (Discover, TV Shows, Movies, etc.) is fully off—no UI, logging, or background work. Saves compute.</p>
-                        <div class="setting-item flex-row" style="margin-top: 15px;">
-                            <label for="disable_media_hunt">Disable Media Hunt &amp; NZB Hunt:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="disable_media_hunt" ${settings.enable_media_hunt === false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">When enabled, Media Hunt, NZB Hunt, and Index Master are fully off—no UI, logging, or background work. Saves compute.</p>
-                        <div class="setting-item flex-row" style="margin-top: 15px;">
-                            <label for="disable_third_party_apps">Disable 3rd Party Apps:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="disable_third_party_apps" ${settings.enable_third_party_apps === false ? "checked" : ""}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p class="setting-help">When enabled, 3rd Party Apps (Sonarr, Radarr, etc.) are fully off—no UI, logging, or hunt cycles. Saves compute.</p>
                     </div>
                 </div>
 
