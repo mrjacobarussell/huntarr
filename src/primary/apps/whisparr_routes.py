@@ -134,11 +134,11 @@ def test_connection():
             if response.status_code == 401:
                 error_msg = "Authentication failed: Invalid API key"
                 whisparr_logger.error(error_msg)
-                return jsonify({"success": False, "message": error_msg}), 401
+                return jsonify({"success": False, "message": error_msg}), 200
             elif response.status_code == 403:
                 error_msg = "Access forbidden: Check API key permissions"
                 whisparr_logger.error(error_msg)
-                return jsonify({"success": False, "message": error_msg}), 403
+                return jsonify({"success": False, "message": error_msg}), 200
             elif response.status_code == 404:
                 error_msg = "API endpoint not found: This doesn't appear to be a valid Whisparr server. Check your URL."
                 whisparr_logger.error(error_msg)
@@ -146,11 +146,11 @@ def test_connection():
             elif response.status_code >= 500:
                 error_msg = f"Whisparr server error (HTTP {response.status_code}): The Whisparr server is experiencing issues"
                 whisparr_logger.error(error_msg)
-                return jsonify({"success": False, "message": error_msg}), response.status_code
+                return jsonify({"success": False, "message": error_msg}), 200
             else:
                 error_msg = f"HTTP error {response.status_code} connecting to Whisparr"
                 whisparr_logger.error(error_msg)
-                return jsonify({"success": False, "message": error_msg}), response.status_code
+                return jsonify({"success": False, "message": error_msg}), 200
         else:
             error_msg = "Could not connect to any Whisparr API endpoint"
             whisparr_logger.error(error_msg)

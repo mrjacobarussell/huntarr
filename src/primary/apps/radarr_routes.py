@@ -76,11 +76,11 @@ def test_connection():
         if response.status_code == 401:
             error_msg = "Authentication failed: Invalid API key"
             radarr_logger.error(error_msg)
-            return jsonify({"success": False, "message": error_msg}), 401
+            return jsonify({"success": False, "message": error_msg}), 200
         elif response.status_code == 403:
             error_msg = "Access forbidden: Check API key permissions"
             radarr_logger.error(error_msg)
-            return jsonify({"success": False, "message": error_msg}), 403
+            return jsonify({"success": False, "message": error_msg}), 200
         elif response.status_code == 404:
             error_msg = "API endpoint not found: This doesn't appear to be a valid Radarr server. Check your URL."
             radarr_logger.error(error_msg)
@@ -88,7 +88,7 @@ def test_connection():
         elif response.status_code >= 500:
             error_msg = f"Radarr server error (HTTP {response.status_code}): The Radarr server is experiencing issues"
             radarr_logger.error(error_msg)
-            return jsonify({"success": False, "message": error_msg}), response.status_code
+            return jsonify({"success": False, "message": error_msg}), 200
             
         # Raise for other HTTP errors
         response.raise_for_status()
