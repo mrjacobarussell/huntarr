@@ -6,8 +6,8 @@ Only the latest stable release receives security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 9.x.x   | :white_check_mark: |
-| < 9.0   | :x:                |
+| 1.x.x   | :white_check_mark: |
+| < 1.0   | :x:                |
 
 ## Reporting a Vulnerability
 
