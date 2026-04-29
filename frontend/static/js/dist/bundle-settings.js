@@ -773,6 +773,10 @@ window.SettingsForms = {
                 timezone: getVal('timezone', 'UTC'),
                 display_community_resources: getVal('display_community_resources', true),
                 display_huntarr_support: getVal('display_huntarr_support', true),
+                enable_requestarr: true, // Always enabled (required for Movie Hunt)
+
+                show_trending: getVal('show_trending', true),
+                show_nzb_hunt_on_home: getVal('show_nzb_hunt_on_home', false),
                 tmdb_image_cache_days: parseInt(container.querySelector('#tmdb_image_cache_days')?.value || '30'),
                 auth_mode: (container.querySelector('#auth_mode') && container.querySelector('#auth_mode').value) || 'login',
                 ssl_verify: getVal('ssl_verify', true),
@@ -841,6 +845,11 @@ window.SettingsForms = {
             settings.timezone = getInputValue("#timezone", "UTC");
             settings.display_community_resources = getInputValue("#display_community_resources", true);
             settings.display_huntarr_support = getInputValue("#display_huntarr_support", true);
+            settings.enable_requestarr = true; // Always enabled (required for Movie Hunt)
+
+            settings.show_trending = getInputValue("#show_trending", true);
+            settings.enable_smarthunt = getInputValue("#enable_smarthunt", true);
+
             const authMode = container.querySelector("#auth_mode")?.value || "login";
             settings.auth_mode = authMode;
             settings.ssl_verify = getInputValue("#ssl_verify", true);
@@ -854,6 +863,9 @@ window.SettingsForms = {
                     settings.frame_ancestors = faSel.value;
                 }
             }
+            settings.enable_requestarr = !getInputValue("#disable_requests", false);
+            settings.enable_media_hunt = !getInputValue("#disable_media_hunt", false);
+            settings.enable_third_party_apps = !getInputValue("#disable_third_party_apps", false);
             settings.base_url = getInputValue("#base_url", "");
             settings.dev_key = getInputValue("#dev_key", "");
 
@@ -13749,8 +13761,6 @@ document.head.appendChild(styleEl);
     // App type display info
     var APP_TYPES = [
         { key: 'all', label: 'All Apps', icon: 'fas fa-layer-group', color: '#818cf8' },
-        { key: 'movie_hunt', label: 'Movie Hunt', icon: 'fas fa-film', color: '#f59e0b' },
-        { key: 'tv_hunt', label: 'TV Hunt', icon: 'fas fa-tv', color: '#0ea5e9' },
         { key: 'sonarr', label: 'Sonarr', icon: 'fas fa-tv', color: '#60a5fa' },
         { key: 'radarr', label: 'Radarr', icon: 'fas fa-video', color: '#f97316' },
         { key: 'lidarr', label: 'Lidarr', icon: 'fas fa-music', color: '#34d399' },
@@ -14659,6 +14669,11 @@ document.head.appendChild(styleEl);
                             <input type="text" id="base_url" value="${settings.base_url || ""}" placeholder="/huntarr" class="mset-input">
                             <p class="setting-help">Base URL path for reverse proxy. Requires restart.</p>
                         </div>
+                        <div class="setting-item" style="margin-top: 15px; border-top: 1px solid rgba(148, 163, 184, 0.08); padding-top: 15px;">
+                            <label for="tmdb_api_key">TMDB API Key:</label>
+                            <input type="password" id="tmdb_api_key" value="${settings.tmdb_api_key || ""}" placeholder="Leave blank to use the built-in key" class="mset-input">
+                            <p class="setting-help">Override the built-in TMDB API key with your own. Get one free at <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org/settings/api</a>.</p>
+                        </div>
                         <div class="setting-item">
                             <label for="dev_key">Huntarr Dev Key:${settings.dev_mode === true ? ' <i class="fas fa-check-circle" style="color: #22c55e; margin-left: 5px;" title="Dev Mode Active"></i>' : ''}</label>
                             <input type="password" id="dev_key" value="${settings.dev_key || ""}" placeholder="Enter dev key" class="mset-input">
@@ -14838,12 +14853,31 @@ document.head.appendChild(styleEl);
             window.SettingsForms.saveAppSettings("general", settings, "Settings saved successfully", { section: "main" })
                 .then(function() {
                     if (window.huntarrUI) {
+                        window.huntarrUI._enableRequestarr = settings.enable_requestarr !== false;
+                        window.huntarrUI._enableMediaHunt = settings.enable_media_hunt !== false;
                         window.huntarrUI._enableThirdPartyApps = settings.enable_third_party_apps !== false;
                     }
+                    // Update sidebar visibility immediately from saved settings (don't rely on async fetch)
+                    var requestsGroup = document.getElementById('nav-group-requests');
+                    var mediaHuntGroup = document.getElementById('nav-group-media-hunt');
+                    var nzbHuntGroup = document.getElementById('nzb-hunt-sidebar-group');
+                    var appsGroup = document.getElementById('nav-group-apps');
+                    var appsLabel = document.getElementById('nav-group-apps-label');
+                    if (requestsGroup) requestsGroup.style.display = (settings.enable_requestarr === false) ? 'none' : '';
+                    if (mediaHuntGroup) mediaHuntGroup.style.display = (settings.enable_media_hunt === false) ? 'none' : '';
+                    if (nzbHuntGroup) nzbHuntGroup.style.display = (settings.enable_media_hunt === false) ? 'none' : '';
+                    if (appsGroup) appsGroup.style.display = (settings.enable_third_party_apps === false) ? 'none' : '';
+                    if (appsLabel) appsLabel.style.display = (settings.enable_media_hunt === false && settings.enable_third_party_apps === false) ? 'none' : '';
                     if (typeof window.applyFeatureFlags === 'function') window.applyFeatureFlags();
+                    if (window.HomeRequestarr && typeof window.HomeRequestarr.applyTrendingVisibility === 'function') {
+                        window.HomeRequestarr.applyTrendingVisibility();
+                    }
                     if (window.huntarrUI && window.huntarrUI.currentSection === 'home') {
                         if (window.HuntarrStats && typeof window.HuntarrStats.loadMediaStats === 'function') {
                             window.HuntarrStats.loadMediaStats(true);
+                        }
+                        if (window.HuntarrIndexerHuntHome && typeof window.HuntarrIndexerHuntHome.load === 'function') {
+                            window.HuntarrIndexerHuntHome.load();
                         }
                     }
                 }).catch(function() {});

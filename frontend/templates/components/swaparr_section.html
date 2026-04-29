@@ -43,16 +43,20 @@
         border: none !important;
     }
     
-    #swaparrSection {
-        display: none;
+    #swaparrSection:not(.active) {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+    }
+
+    #swaparrSection.active {
+        display: block !important;
         width: 100%;
         height: auto;
-        overflow: hidden; /* Prevent double scrollbar */
-        padding-bottom: 60px; /* Clear space at the bottom */
-    }
-    
-    #swaparrSection.active {
-        display: block;
+        overflow: hidden;
+        padding-bottom: 60px;
     }
     
     /* Single scroll container - ONLY this element should scroll */
