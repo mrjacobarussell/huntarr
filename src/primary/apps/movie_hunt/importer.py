@@ -402,16 +402,33 @@ def import_movie(client: Dict[str, Any], title: str, year: str, download_path: s
             _mh_log().error("Import: no root folder for '%s' (%s)", title, year)
             return False
         
-        # Verify root folder exists
+        # Verify root folder exists (may be on a mount that isn't ready yet)
         if not os.path.exists(root_folder):
-            _mh_log().error("Import: root folder does not exist: %s", root_folder)
+            _mh_log().warning("Import: root folder not available: %s — queuing for retry", root_folder)
+            from src.primary.utils.mount_monitor import queue_pending_import
+            queue_pending_import('movie', {
+                'client': client, 'title': title, 'year': year,
+                'download_path': download_path, 'instance_id': instance_id,
+                'release_name': release_name, 'root_folder': root_folder,
+            }, reason=f"root folder not available: {root_folder}")
             return False
-        
+
         # 2. Translate path using remote mappings
         client_host = f"{client.get('host', '')}:{client.get('port', 8080)}"
         local_path = _translate_remote_path(download_path, client_host)
         _mh_log().info("Import: using local path for '%s': %s", title, local_path)
-        
+
+        # Check download path availability (may be on a mount that isn't ready yet)
+        if not os.path.exists(local_path):
+            _mh_log().warning("Import: download path not available: %s — queuing for retry", local_path)
+            from src.primary.utils.mount_monitor import queue_pending_import
+            queue_pending_import('movie', {
+                'client': client, 'title': title, 'year': year,
+                'download_path': download_path, 'instance_id': instance_id,
+                'release_name': release_name, 'root_folder': root_folder,
+            }, reason=f"download path not available: {local_path}")
+            return False
+
         # 3. Find video file
         video_file = _find_largest_video_file(local_path)
         if not video_file:

@@ -299,13 +299,34 @@ def import_episode(client: Dict[str, Any], series_title: str, year: str,
             return False
 
         if not os.path.exists(root_folder):
-            _tv_log().error("Import: root folder does not exist: %s", root_folder)
+            _tv_log().warning("Import: root folder not available: %s — queuing for retry", root_folder)
+            from src.primary.utils.mount_monitor import queue_pending_import
+            queue_pending_import('tv', {
+                'client': client, 'series_title': series_title, 'year': year,
+                'season': season, 'episode': episode, 'episode_title': episode_title,
+                'download_path': download_path, 'instance_id': instance_id,
+                'release_name': release_name, 'series_type': series_type,
+                'root_folder': root_folder,
+            }, reason=f"root folder not available: {root_folder}")
             return False
 
         # 2. Translate path using remote mappings
         client_host = f"{client.get('host', '')}:{client.get('port', 8080)}"
         local_path = _translate_remote_path(download_path, client_host)
         _tv_log().info("Import: using local path for '%s': %s", series_title, local_path)
+
+        # Check download path availability (may be on a mount that isn't ready yet)
+        if not os.path.exists(local_path):
+            _tv_log().warning("Import: download path not available: %s — queuing for retry", local_path)
+            from src.primary.utils.mount_monitor import queue_pending_import
+            queue_pending_import('tv', {
+                'client': client, 'series_title': series_title, 'year': year,
+                'season': season, 'episode': episode, 'episode_title': episode_title,
+                'download_path': download_path, 'instance_id': instance_id,
+                'release_name': release_name, 'series_type': series_type,
+                'root_folder': root_folder,
+            }, reason=f"download path not available: {local_path}")
+            return False
 
         # 3. Find video file
         video_file = _find_largest_video_file(local_path)

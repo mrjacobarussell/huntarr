@@ -215,6 +215,10 @@ def run_background_tasks():
     """Runs the Huntarr background processing."""
     bg_logger = get_logger("HuntarrBackground") # Use app's logger
     try:
+        # Start mount monitor to retry imports when mounts become available
+        from src.primary.utils.mount_monitor import start_mount_monitor
+        start_mount_monitor()
+
         bg_logger.info("Starting Huntarr background tasks...")
         start_huntarr() # This function contains the main loop and shutdown logic
     except Exception as e:

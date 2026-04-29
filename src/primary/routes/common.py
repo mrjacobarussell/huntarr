@@ -198,6 +198,21 @@ def readiness_check():
         }), 503
 
 
+@common_bp.route('/api/pending-imports', methods=['GET'])
+def get_pending_imports():
+    """Return queued imports waiting for mount/path availability."""
+    from src.primary.utils.mount_monitor import get_pending_imports as _get
+    return jsonify({"pending": _get()}), 200
+
+
+@common_bp.route('/api/pending-imports', methods=['DELETE'])
+def clear_pending_imports():
+    """Clear all pending imports."""
+    from src.primary.utils.mount_monitor import clear_pending_imports as _clear
+    count = _clear()
+    return jsonify({"cleared": count}), 200
+
+
 @common_bp.route('/api/sleep.json', methods=['GET'])
 def api_get_sleep_json():
     """API endpoint to serve sleep/cycle data from the database for frontend access"""
