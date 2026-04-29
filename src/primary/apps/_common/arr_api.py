@@ -11,6 +11,7 @@ ARR_API_VERSIONS = {
     "readarr": "v1",
     "whisparr": "v3",
     "eros": "v3",
+    "sportarr": "v3",
 }
 
 

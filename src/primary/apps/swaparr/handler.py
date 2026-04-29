@@ -293,7 +293,8 @@ def get_queue_items(app_name, api_url, api_key, api_timeout=120):
         "lidarr": "v1",
         "readarr": "v1",
         "whisparr": "v3",
-        "eros": "v3"  # Eros is Whisparr V3
+        "eros": "v3",  # Eros is Whisparr V3
+        "sportarr": "v3"  # Sportarr uses v3 API
     }
     
     api_version = api_version_map.get(app_name, "v3")
@@ -344,7 +345,7 @@ def get_queue_items(app_name, api_url, api_key, api_timeout=120):
     # Normalize the response based on app type
     if app_name in ["radarr", "whisparr", "eros"]:
         return parse_queue_items(all_records, "movie", app_name)
-    elif app_name == "sonarr":
+    elif app_name in ["sonarr", "sportarr"]:
         return parse_queue_items(all_records, "series", app_name)
     elif app_name == "lidarr":
         return parse_queue_items(all_records, "album", app_name)
@@ -480,11 +481,25 @@ def trigger_search_for_item(app_name, api_url, api_key, item, api_timeout=120):
             if movie_id:
                 search_url = f"{api_url.rstrip('/')}/api/{api_version}/command"
                 payload = {
-                    "name": "MoviesSearch", 
+                    "name": "MoviesSearch",
                     "movieIds": [movie_id]
                 }
             else:
                 swaparr_logger.warning(f"Cannot trigger search for {item.get('name', 'unknown')} - missing movie ID")
+                return False
+
+        elif app_name == "sportarr":
+            series_id = item.get("seriesId")
+            episode_ids = item.get("episodeIds", [])
+            if series_id and episode_ids:
+                search_url = f"{api_url.rstrip('/')}/api/{api_version}/command"
+                payload = {
+                    "name": "EpisodeSearch",
+                    "seriesId": series_id,
+                    "episodeIds": episode_ids
+                }
+            else:
+                swaparr_logger.warning(f"Cannot trigger search for {item.get('name', 'unknown')} - missing series/episode IDs")
                 return False
         else:
             swaparr_logger.warning(f"Search not supported for app: {app_name}")

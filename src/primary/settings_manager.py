@@ -32,7 +32,7 @@ settings_logger = logging.getLogger("settings_manager")
 from src.primary.utils.database import get_database
 
 # Known app types
-KNOWN_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "swaparr", "prowlarr", "movie_hunt", "tv_hunt", "general"]
+KNOWN_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "swaparr", "prowlarr", "sportarr", "movie_hunt", "tv_hunt", "general"]
 
 # Thread-safe settings cache with timestamps to avoid excessive database reads
 _settings_cache = {}  # Format: {app_name: {'timestamp': timestamp, 'data': settings_dict}}
@@ -354,7 +354,7 @@ def save_settings(app_name: str, settings_data: Dict[str, Any]) -> bool:
                             settings_logger.warning(f"{field} for {app_name} instance {i+1} was {original_value}, automatically set to minimum allowed value of 0")
     
     # Ensure every instance has an explicit 'enabled' field so .get("enabled", True) never silently re-enables
-    _apps_with_instances = ("sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros")
+    _apps_with_instances = ("sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr")
     if app_name in _apps_with_instances and "instances" in settings_data and isinstance(settings_data["instances"], list):
         for inst in settings_data["instances"]:
             if isinstance(inst, dict) and "enabled" not in inst:

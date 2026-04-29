@@ -492,7 +492,7 @@ def load_schedule():
         return db.get_schedules()
     except Exception as e:
         scheduler_logger.error(f"Error loading schedule from database: {e}")
-        return {"global": [], "sonarr": [], "radarr": [], "lidarr": [], "readarr": [], "whisparr": [], "eros": [], "movie_hunt": [], "tv_hunt": []}
+        return {"global": [], "sonarr": [], "radarr": [], "lidarr": [], "readarr": [], "whisparr": [], "eros": [], "sportarr": [], "movie_hunt": [], "tv_hunt": []}
 
 
 # ---------------------------------------------------------------------------

@@ -91,7 +91,13 @@ def get_default_instance_config(app_type: str) -> Dict[str, Any]:
             "hunt_missing_items": 1,
             "hunt_upgrade_items": 0,
         })
-    
+    elif app_type == "sportarr":
+        base_instance.update({
+            "hunt_missing_items": 1,
+            "hunt_upgrade_items": 0,
+            "skip_future_releases": True,
+        })
+
     return base_instance
 
 
@@ -229,6 +235,14 @@ EROS_DEFAULTS = {
     "hourly_cap": 20
 }
 
+# Sportarr default configuration
+SPORTARR_DEFAULTS = {
+    "instances": [],  # No default instances - user creates first instance
+    "sleep_duration": 900,
+    "skip_future_releases": True,
+    "hourly_cap": 20
+}
+
 # Prowlarr default configuration
 PROWLARR_DEFAULTS = {
     "name": "Prowlarr",
@@ -327,6 +341,7 @@ def get_default_config(app_type: str) -> Dict[str, Any]:
         'readarr': READARR_DEFAULTS,
         'whisparr': WHISPARR_DEFAULTS,
         'eros': EROS_DEFAULTS,
+        'sportarr': SPORTARR_DEFAULTS,
         'swaparr': SWAPARR_DEFAULTS,
         'general': GENERAL_DEFAULTS
     }
@@ -377,4 +392,4 @@ def get_tv_hunt_instance_settings_defaults() -> Dict[str, Any]:
 
 def get_all_app_types() -> list:
     """Get list of all supported app types."""
-    return ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'swaparr', 'general']
+    return ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'sportarr', 'swaparr', 'general']

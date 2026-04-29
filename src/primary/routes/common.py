@@ -1078,7 +1078,7 @@ def reset_stats_api():
         data = request.json or {}
         app_type = data.get('app_type')  # None will reset all
         
-        if app_type is not None and app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]:
+        if app_type is not None and app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]:
             logger.warning(f"Invalid app_type for stats reset: {app_type}")
             return jsonify({"success": False, "error": "Invalid app_type"}), 400
             

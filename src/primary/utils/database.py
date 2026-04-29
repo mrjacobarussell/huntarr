@@ -3932,7 +3932,7 @@ class LogsDatabase:
                 params = []
                 
                 if app_type and app_type != "all":
-                    base_apps = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "swaparr"]
+                    base_apps = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr", "swaparr"]
                     app_lower = (app_type or "").lower()
                     # media_hunt = Movie Hunt + TV Hunt combined (default for Media Hunt Logs)
                     if app_lower == "media_hunt":
@@ -3987,7 +3987,7 @@ class LogsDatabase:
                 params = []
                 
                 if app_type and app_type != "all":
-                    base_apps = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "swaparr"]
+                    base_apps = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr", "swaparr"]
                     app_lower = (app_type or "").lower()
                     # media_hunt = Movie Hunt + TV Hunt combined (default for Media Hunt Logs)
                     if app_lower == "media_hunt":
@@ -4086,7 +4086,7 @@ class LogsDatabase:
                 part = (at or "").split("-")[0].strip().lower()
                 if part:
                     base.add(part)
-            order = ["all", "system", "sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "swaparr", "movie_hunt", "tv_hunt"]
+            order = ["all", "system", "sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr", "swaparr", "movie_hunt", "tv_hunt"]
             result = [a for a in order if a in base or (a == "all" and base)]
             if "all" not in result and base:
                 result.insert(0, "all")
@@ -4115,7 +4115,7 @@ class LogsDatabase:
         try:
             with self.get_logs_connection() as conn:
                 if app_type:
-                    base_apps = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "swaparr"]
+                    base_apps = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr", "swaparr"]
                     app_lower = (app_type or "").lower()
                     if app_lower == "media_hunt":
                         cursor = conn.execute("DELETE FROM logs WHERE app_type IN (?, ?)", ("movie_hunt", "tv_hunt"))

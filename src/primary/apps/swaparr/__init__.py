@@ -34,13 +34,21 @@ def get_configured_instances(quiet=False):
         except ImportError:
             eros_instances = []
         
+        # Try to import Sportarr instances (may not exist in all installations)
+        try:
+            from src.primary.apps.sportarr import get_configured_instances as get_sportarr_instances
+            sportarr_instances = get_sportarr_instances(quiet=quiet)
+        except ImportError:
+            sportarr_instances = []
+
         instances = {
             "radarr": get_radarr_instances(quiet=quiet),
             "sonarr": get_sonarr_instances(quiet=quiet),
             "lidarr": get_lidarr_instances(quiet=quiet),
             "readarr": get_readarr_instances(quiet=quiet),
             "whisparr": whisparr_instances,
-            "eros": eros_instances
+            "eros": eros_instances,
+            "sportarr": sportarr_instances
         }
         
         return instances

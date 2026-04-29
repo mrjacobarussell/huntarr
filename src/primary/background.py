@@ -46,11 +46,11 @@ swaparr_thread = None
 prowlarr_stats_thread = None
 
 # Define which apps have background processing cycles
-CYCLICAL_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]
+CYCLICAL_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]
 
 # Apps that schedule each instance on its own interval (only run an instance when its next_cycle_time is due)
 # All cyclical *arr apps use per-instance scheduling for true independent timing.
-PER_INSTANCE_SCHEDULING_APP_TYPES = {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"}
+PER_INSTANCE_SCHEDULING_APP_TYPES = {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"}
 
 # Instance list generator has been removed
 
@@ -285,6 +285,13 @@ def app_specific_loop(app_type: str) -> None:
             process_upgrades = getattr(upgrade_module, 'process_cutoff_upgrades')
             hunt_missing_setting = "hunt_missing_items"
             hunt_upgrade_setting = "hunt_upgrade_items"
+        elif app_type == "sportarr":
+            missing_module = importlib.import_module('src.primary.apps.sportarr.missing')
+            upgrade_module = importlib.import_module('src.primary.apps.sportarr.upgrade')
+            process_missing = getattr(missing_module, 'process_missing_items')
+            process_upgrades = getattr(upgrade_module, 'process_cutoff_upgrades')
+            hunt_missing_setting = "hunt_missing_items"
+            hunt_upgrade_setting = "hunt_upgrade_items"
         elif app_type == "movie_hunt":
             process_missing = getattr(missing_module, 'process_missing_movies')
             process_upgrades = getattr(upgrade_module, 'process_cutoff_upgrades')
@@ -312,7 +319,7 @@ def app_specific_loop(app_type: str) -> None:
         try:
             general_settings = settings_manager.load_settings('general') or {}
             media_hunt_types = ['movie_hunt', 'tv_hunt']
-            third_party_types = ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros']
+            third_party_types = ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'sportarr']
             if app_type in media_hunt_types and general_settings.get('enable_media_hunt') is False:
                 app_logger.debug(f"[{app_type.upper()}] Media Hunt disabled in settings. Sleeping 60s.")
                 stop_event.wait(60)
@@ -581,6 +588,9 @@ def app_specific_loop(app_type: str) -> None:
                 hunt_missing_value = instance_details.get("hunt_missing_items", 1)  # Default to 1
                 hunt_upgrade_value = instance_details.get("hunt_upgrade_items", 0)  # Default to 0
             elif app_type == "eros":
+                hunt_missing_value = instance_details.get("hunt_missing_items", 1)  # Default to 1
+                hunt_upgrade_value = instance_details.get("hunt_upgrade_items", 0)  # Default to 0
+            elif app_type == "sportarr":
                 hunt_missing_value = instance_details.get("hunt_missing_items", 1)  # Default to 1
                 hunt_upgrade_value = instance_details.get("hunt_upgrade_items", 0)  # Default to 0
             elif app_type == "movie_hunt":

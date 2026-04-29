@@ -156,7 +156,7 @@ def increment_hourly_cap(app_type: str, count: int = 1, instance_name: Optional[
     Increment hourly API usage for an app or (app, instance).
     When instance_name is set (or from thread-local in per-instance context), uses per-instance counter.
     """
-    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]:
+    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]:
         logger.error(f"Invalid app_type for hourly cap: {app_type}")
         return False
     if instance_name is None:
@@ -212,7 +212,7 @@ def get_hourly_cap_status(app_type: str, instance_name: Optional[str] = None) ->
     Get current API usage status for an app or (app, instance).
     When instance_name is set, returns that instance's usage and limit.
     """
-    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]:
+    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]:
         return {"error": f"Invalid app_type: {app_type}"}
     with hourly_lock:
         try:
@@ -372,14 +372,14 @@ def save_stats(stats: Dict[str, Dict[str, int]]) -> bool:
 def increment_stat(app_type: str, stat_type: str, count: int = 1, instance_name: Optional[str] = None) -> bool:
     """
     Increment a specific statistic (app-level and optionally per-instance).
-    
+
     Args:
         app_type: The application type (sonarr, radarr, etc.)
         stat_type: The type of statistic (hunted or upgraded)
         count: The amount to increment by (default: 1)
         instance_name: If set, also increment per-instance stat for Home dashboard
     """
-    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]:
+    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]:
         logger.error(f"Invalid app_type: {app_type}")
         return False
         
@@ -411,7 +411,7 @@ def increment_stat_only(app_type: str, stat_type: str, count: int = 1, instance_
     Increment a specific statistic and the hourly API cap (so the API bar matches searches/upgrades).
     Optionally increments per-instance stat for Home dashboard.
     """
-    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]:
+    if app_type not in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]:
         logger.error(f"Invalid app_type: {app_type}")
         return False
         
@@ -459,7 +459,7 @@ def get_stats() -> Dict[str, Any]:
             all_lock_info = db.get_all_instance_lock_info() if hasattr(db, "get_all_instance_lock_info") else {}  # 1 query
             # load_stats() above was 1 query — total: 4 queries
             
-            for app_type in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"]:
+            for app_type in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr"]:
                 if app_type not in stats:
                     stats[app_type] = {"hunted": 0, "upgraded": 0}
                 
@@ -546,7 +546,7 @@ def load_hourly_caps_for_api() -> tuple:
         default_caps = get_default_hourly_caps()
         caps_out = {}
         limits_out = {}
-        for app in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "movie_hunt", "tv_hunt"]:
+        for app in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr", "movie_hunt", "tv_hunt"]:
             try:
                 configured = []
                 try:
@@ -586,7 +586,7 @@ def load_hourly_caps_for_api() -> tuple:
         return caps_out, limits_out
     except Exception as e:
         logger.error(f"Error loading hourly caps for API: {e}")
-        return load_hourly_caps(), {app: _get_app_hourly_cap_limit(app) for app in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "movie_hunt", "tv_hunt"]}
+        return load_hourly_caps(), {app: _get_app_hourly_cap_limit(app) for app in ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "sportarr", "movie_hunt", "tv_hunt"]}
 
 def reset_stats(app_type: Optional[str] = None) -> bool:
     """
