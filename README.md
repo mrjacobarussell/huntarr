@@ -24,20 +24,21 @@ Your *arr apps (Sonarr, Radarr, etc.) monitor RSS feeds for new releases — but
 
 **Quality upgrades** — Finds items below your quality cutoff and queues upgrades, again in batches you control.
 
-**Stuck downloads (Swaparr)** — Monitors your download clients for stalled or slow torrents/NZBs. After a configurable number of strikes, it removes the dead download and lets your *arr app find a replacement automatically.
+**Stuck downloads (Swaparr)** — Monitors your download clients for stalled or slow torrents/NZBs. After a configurable number of strikes, it removes the dead download and lets your *arr app find a replacement automatically. Also detects downloads that finished but were rejected for import due to a quality/match mismatch — these get struck and removed so a better release can be found.
 
 ---
 
 ## Supported Apps
 
-| App | Missing | Upgrades |
-|-----|:-------:|:--------:|
-| Sonarr | ✅ | ✅ |
-| Radarr | ✅ | ✅ |
-| Lidarr | ✅ | ✅ |
-| Readarr | ✅ | ✅ |
-| Whisparr v2 | ✅ | ✅ |
-| Whisparr v3 | ✅ | ✅ |
+| App | Missing | Upgrades | Swaparr |
+|-----|:-------:|:--------:|:-------:|
+| Sonarr | ✅ | ✅ | ✅ |
+| Radarr | ✅ | ✅ | ✅ |
+| Lidarr | ✅ | ✅ | ✅ |
+| Readarr | ✅ | ✅ | ✅ |
+| Whisparr v2 | ✅ | ✅ | ✅ |
+| Whisparr v3 | ✅ | ✅ | ✅ |
+| Sportarr | — | — | ✅ |
 
 ---
 
@@ -70,6 +71,16 @@ services:
 4. **Swaparr** (optional) — Enable to automatically remove stalled downloads after N strikes so your queue never stays stuck.
 
 Hourly API caps and queue size limits are built in to keep your indexers happy.
+
+---
+
+## Notable Features
+
+**Swaparr quality-rejection handling** — Downloads that complete but won't import because they don't meet the quality cutoff are no longer ignored. Swaparr detects them via `trackedDownloadState` and `statusMessages`, applies strikes over time, then removes and re-searches once the threshold is exceeded.
+
+**Lidarr low-match queue clearing** — Per-instance toggle to bulk-remove and blacklist `importPending` queue items with warning/error status before each search cycle, so Lidarr re-searches for a better release immediately rather than leaving them stuck.
+
+**Mount-aware import retry** — When a container starts before NFS/SMB mounts are ready, failed imports are queued and retried in the background (up to ~2 hours) instead of being permanently lost.
 
 ---
 
