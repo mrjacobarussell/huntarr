@@ -55,14 +55,21 @@ def process_missing_albums(
     
     # App-specific settings
     hunt_missing_mode = app_settings.get("hunt_missing_mode", "album")
-    
+    clear_low_match_queue = app_settings.get("clear_low_match_queue", False)
+
     # Early exit for disabled features
     if not validate_settings(api_url, api_key, hunt_missing_items, "lidarr", lidarr_logger):
         return False
-    
+
     # Make sure any requested stop function is executable
     stop_check = stop_check if callable(stop_check) else lambda: False
-    
+
+    # Clear stuck low-match-quality queue items before searching so Lidarr can re-try them
+    if clear_low_match_queue:
+        removed = lidarr_api.clear_low_match_queue_items(api_url, api_key, api_timeout)
+        if removed:
+            lidarr_logger.info(f"Cleared {removed} low-match queue item(s) — Lidarr will re-search.")
+
     lidarr_logger.info(f"Looking for missing albums for {instance_name}")
     lidarr_logger.debug(f"Processing up to {hunt_missing_items} missing items in {hunt_missing_mode} mode")
     

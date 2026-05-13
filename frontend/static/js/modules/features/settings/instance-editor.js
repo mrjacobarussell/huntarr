@@ -522,6 +522,7 @@
             safeInstance.hunt_missing_mode = instance.hunt_missing_mode || 'album';
             safeInstance.upgrade_selection_method = instance.upgrade_selection_method !== undefined ? instance.upgrade_selection_method : 'cutoff';
             safeInstance.upgrade_tag = instance.upgrade_tag !== undefined ? instance.upgrade_tag : '';
+            safeInstance.clear_low_match_queue = instance.clear_low_match_queue === true;
         } else if (appType === 'readarr') {
             safeInstance.hunt_missing_items = instance.hunt_missing_books !== undefined ? instance.hunt_missing_books : 1;
             safeInstance.hunt_upgrade_items = instance.hunt_upgrade_books !== undefined ? instance.hunt_upgrade_books : 0;
@@ -710,6 +711,16 @@
                             </select>
                         </div>
                         <p class="editor-help-text">Search for individual albums (Artist mode deprecated in Huntarr 7.5.0+)</p>
+                    </div>
+                    <div class="editor-field-group">
+                        <div class="editor-setting-item">
+                            <label>Clear Low-Match Queue Items</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="editor-clear-low-match" ${safeInstance.clear_low_match_queue ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <p class="editor-help-text">Before each search cycle, remove and blacklist any queue items stuck in <em>importPending</em> due to a low match percentage so Lidarr will re-search for a better release.</p>
                     </div>
                 `;
             }
@@ -1167,6 +1178,8 @@
              if (appType === 'lidarr') {
                  const lidarrModeEl = document.getElementById('editor-lidarr-missing-mode');
                  if (lidarrModeEl) newData.hunt_missing_mode = lidarrModeEl.value || 'album';
+                 const clearLowMatchEl = document.getElementById('editor-clear-low-match');
+                 if (clearLowMatchEl) newData.clear_low_match_queue = clearLowMatchEl.checked;
              }
              if (appType === 'eros') {
                  const erosModeEl = document.getElementById('editor-eros-search-mode');

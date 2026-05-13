@@ -846,6 +846,48 @@ def get_cutoff_unmet_albums_random_page(api_url: str, api_key: str, api_timeout:
     lidarr_logger.error("All attempts to get cutoff unmet albums failed")
     return []
 
+def clear_low_match_queue_items(api_url: str, api_key: str, api_timeout: int) -> int:
+    """
+    Find queue items stuck in importPending with a warning/error status (typically low match
+    percentage) and remove + blacklist them so Lidarr will re-search for a better release.
+
+    Returns the number of items removed.
+    """
+    queue = get_queue(api_url, api_key, api_timeout)
+    if not queue:
+        return 0
+
+    stuck = [
+        item for item in queue
+        if item.get("trackedDownloadState") == "importPending"
+        and item.get("trackedDownloadStatus") in ("warning", "error")
+    ]
+
+    if not stuck:
+        lidarr_logger.debug("No stuck low-match queue items found.")
+        return 0
+
+    ids = [item["id"] for item in stuck]
+    lidarr_logger.info(
+        f"Removing {len(ids)} stuck low-match queue item(s) and blacklisting releases: "
+        + ", ".join(item.get("title", str(item["id"])) for item in stuck)
+    )
+
+    result = arr_request(
+        api_url, api_key, api_timeout,
+        "queue/bulk",
+        method="DELETE",
+        data={"ids": ids, "blacklist": True, "removeFromClient": True},
+        count_api=False,
+    )
+
+    if result is None:
+        lidarr_logger.error("Failed to bulk-remove low-match queue items.")
+        return 0
+
+    return len(ids)
+
+
 def get_quality_profiles(api_url: str, api_key: str, api_timeout: int) -> Optional[List[Dict]]:
     """
     Get all quality profiles configured in Lidarr.

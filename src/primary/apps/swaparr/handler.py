@@ -232,6 +232,45 @@ def check_for_failed_imports(item, settings):
     
     return False, ""
 
+def check_quality_match_failure(item):
+    """Return True if a completed download is stuck because quality doesn't meet the profile cutoff."""
+    # Only relevant for 100%-complete items still sitting in the queue
+    if item.get("sizeleft", 1) != 0:
+        return False, ""
+
+    tracked_state = item.get("tracked_download_state", "")
+    status_text = item.get("status_messages", "")
+    error_text = item.get("error_message", "").lower()
+    combined = status_text + " " + error_text
+
+    quality_rejection_phrases = [
+        "quality cutoff",
+        "does not meet cutoff",
+        "not meet cutoff",
+        "cutoff not met",
+        "quality is below",
+        "rejected because",
+        "no eligible files",
+        "no files found are eligible",
+        "quality doesn't meet",
+        "quality does not meet",
+        "not eligible for import",
+    ]
+
+    for phrase in quality_rejection_phrases:
+        if phrase in combined:
+            return True, f"Quality match failure: {phrase}"
+
+    # trackedDownloadState == "importPending" with no other explanation usually means
+    # the *arr app is holding the file because it doesn't meet the quality cutoff.
+    if tracked_state == "importpending" and not any(
+        kw in combined for kw in ["missing", "upgrade", "manual", "permissions", "disk", "space", "path", "mount"]
+    ):
+        return True, "Quality match failure: stuck in importPending with no other reason"
+
+    return False, ""
+
+
 def parse_time_string_to_seconds(time_string):
     """Parse a time string like '2h', '30m', '1d' to seconds"""
     if not time_string:
@@ -392,12 +431,22 @@ def parse_queue_items(records, item_type, app_name):
             except (ValueError, IndexError):
                 eta_seconds = 0
         
+        # Flatten statusMessages into a single searchable string
+        status_messages_raw = record.get("statusMessages", [])
+        status_messages_text = " ".join(
+            " ".join(m.get("messages", [])) + " " + m.get("title", "")
+            for m in status_messages_raw
+            if isinstance(m, dict)
+        ).lower()
+
         queue_items.append({
             "id": record.get("id"),
             "name": name,
             "size": record.get("size", 0),
             "sizeleft": record.get("sizeleft", 0),
             "status": record.get("status", "unknown").lower(),
+            "tracked_download_state": record.get("trackedDownloadState", "").lower(),
+            "status_messages": status_messages_text,
             "eta": eta_seconds,
             "protocol": record.get("protocol", "unknown").lower(),
             "error_message": record.get("errorMessage", "")
@@ -856,11 +905,64 @@ def process_stalled_downloads(app_name, instance_name, instance_data, settings):
             is_completed = sizeleft == 0
             remove_completed_stalled = settings.get("remove_completed_stalled", True)
             if is_completed and not remove_completed_stalled:
-                swaparr_logger.debug(f"Ignoring completed download (100% - waiting for import): {item['name']}")
-                item_state = "Ignored (Completed - waiting for import)"
-                SWAPARR_STATS['items_ignored'] += 1
-                if not settings.get("dry_run", False):
-                    increment_swaparr_stat("ignored", 1)
+                # Even when remove_completed_stalled is off, handle quality-match failures
+                is_quality_failure, quality_failure_reason = check_quality_match_failure(item)
+                if is_quality_failure:
+                    # Treat quality-rejected completed downloads like stalled items: strike then remove+research
+                    if item_id not in strike_data:
+                        strike_data[item_id] = {"strikes": 0, "name": item["name"], "first_strike_time": None, "last_strike_time": None}
+
+                    max_quality_stuck_seconds = parse_time_string_to_seconds(settings.get("max_download_time", "2h"))
+                    first_seen_str = strike_data[item_id].get("first_strike_time")
+                    exceeded_stuck_time = False
+                    if first_seen_str:
+                        try:
+                            first_seen = datetime.fromisoformat(first_seen_str.replace("Z", "+00:00"))
+                            exceeded_stuck_time = (datetime.utcnow() - first_seen.replace(tzinfo=None)).total_seconds() >= max_quality_stuck_seconds
+                        except (ValueError, TypeError):
+                            exceeded_stuck_time = False
+                    else:
+                        strike_data[item_id]["first_strike_time"] = datetime.utcnow().isoformat()
+
+                    if exceeded_stuck_time:
+                        strike_data[item_id]["strikes"] += 1
+                        strike_data[item_id]["last_strike_time"] = datetime.utcnow().isoformat()
+                        current_strikes = strike_data[item_id]["strikes"]
+                        swaparr_logger.info(f"Added strike ({current_strikes}/{settings.get('max_strikes', 3)}) to quality-rejected download: {item['name']} - {quality_failure_reason}")
+                        SWAPARR_STATS['strikes_added'] += 1
+                        if not settings.get("dry_run", False):
+                            increment_swaparr_stat("strikes", 1)
+
+                        if current_strikes >= settings.get("max_strikes", 3):
+                            swaparr_logger.warning(f"Removing quality-rejected download after {current_strikes} strikes: {item['name']}")
+                            if not settings.get("dry_run", False):
+                                trigger_search = settings.get("research_removed", False)
+                                if delete_download(app_name, instance_data["api_url"], instance_data["api_key"], item["id"], True, item, trigger_search):
+                                    swaparr_logger.info(f"Removed quality-rejected download: {item['name']}")
+                                    strike_data[item_id]["removed"] = True
+                                    strike_data[item_id]["removed_time"] = datetime.utcnow().isoformat()
+                                    removed_items[item_hash] = {
+                                        "name": item["name"],
+                                        "size": item["size"],
+                                        "removed_time": datetime.utcnow().isoformat(),
+                                        "reason": quality_failure_reason
+                                    }
+                                    SWAPARR_STATS['downloads_removed'] += 1
+                                    increment_swaparr_stat("removed", 1)
+                            else:
+                                swaparr_logger.info(f"DRY RUN: Would remove quality-rejected download: {item['name']}")
+                            item_state = "Removed (Quality Rejected)" if not settings.get("dry_run", False) else "Would Remove (Quality Rejected - Dry Run)"
+                        else:
+                            item_state = f"Struck (Quality Rejected {current_strikes}/{settings.get('max_strikes', 3)})"
+                    else:
+                        swaparr_logger.debug(f"Quality-rejected download not yet past max_download_time threshold: {item['name']}")
+                        item_state = "Pending (Quality Rejected - waiting for threshold)"
+                else:
+                    swaparr_logger.debug(f"Ignoring completed download (100% - waiting for import): {item['name']}")
+                    item_state = "Ignored (Completed - waiting for import)"
+                    SWAPARR_STATS['items_ignored'] += 1
+                    if not settings.get("dry_run", False):
+                        increment_swaparr_stat("ignored", 1)
                 continue
 
             max_dl_seconds = parse_time_string_to_seconds(settings.get("max_download_time", "2h"))
