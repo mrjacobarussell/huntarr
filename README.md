@@ -40,6 +40,8 @@ Your *arr apps (Sonarr, Radarr, etc.) monitor RSS feeds for new releases — but
 | Whisparr v3 | ✅ | ✅ | ✅ |
 | Sportarr | — | — | ✅ |
 
+**Seed queue torrent clients:** qBittorrent · Transmission · Deluge
+
 ---
 
 ## Installation

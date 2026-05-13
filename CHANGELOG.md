@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented here.
 
+## [1.1.0] - 2026-05-13
+
+### Added
+- **Deluge** support for Max Seed Queue gating — Deluge (default port 8112) is now available alongside qBittorrent and Transmission as a torrent client option. Huntarr authenticates via Deluge's JSON-RPC API and counts active seeding torrents to pause hunts when the queue is full.
+
 ## [1.0.9] - 2026-05-13
 
 ### Fixed
