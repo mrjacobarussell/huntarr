@@ -1037,8 +1037,9 @@
                         <div class="editor-setting-item" style="margin-top: 10px;">
                             <label>Torrent client type</label>
                             <select id="editor-seed-client-type">
-                                <option value="qbittorrent" ${!(safeInstance.seed_check_torrent_client && safeInstance.seed_check_torrent_client.type === 'transmission') ? 'selected' : ''}>qBittorrent</option>
+                                <option value="qbittorrent" ${(!safeInstance.seed_check_torrent_client || safeInstance.seed_check_torrent_client.type === 'qbittorrent') ? 'selected' : ''}>qBittorrent</option>
                                 <option value="transmission" ${(safeInstance.seed_check_torrent_client && safeInstance.seed_check_torrent_client.type === 'transmission') ? 'selected' : ''}>Transmission</option>
+                                <option value="deluge" ${(safeInstance.seed_check_torrent_client && safeInstance.seed_check_torrent_client.type === 'deluge') ? 'selected' : ''}>Deluge</option>
                             </select>
                         </div>
                         <div class="editor-setting-item">
@@ -1112,8 +1113,9 @@
                 const host = hostEl ? (hostEl.value || '').trim() : '';
                 if (!host) return null;
                 const portEl = document.getElementById('editor-seed-client-port');
-                const portVal = portEl && portEl.value !== '' ? parseInt(portEl.value, 10) : (type === 'qbittorrent' ? 8080 : 9091);
-                const port = (!isNaN(portVal) && portVal >= 1 && portVal <= 65535) ? portVal : (type === 'qbittorrent' ? 8080 : 9091);
+                const defaultPort = type === 'qbittorrent' ? 8080 : type === 'deluge' ? 8112 : 9091;
+                const portVal = portEl && portEl.value !== '' ? parseInt(portEl.value, 10) : defaultPort;
+                const port = (!isNaN(portVal) && portVal >= 1 && portVal <= 65535) ? portVal : defaultPort;
                 const userEl = document.getElementById('editor-seed-client-username');
                 const passEl = document.getElementById('editor-seed-client-password');
                 return { type: type, host: host, port: port, username: userEl ? userEl.value : '', password: passEl ? passEl.value : '' };

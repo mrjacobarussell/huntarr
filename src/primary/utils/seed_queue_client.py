@@ -1,5 +1,5 @@
 """
-Get active seeding count from torrent clients (qBittorrent, Transmission).
+Get active seeding count from torrent clients (qBittorrent, Transmission, Deluge).
 Used only for Max Seed Queue gating: skip hunts when seeding count >= limit.
 Read-only; no torrent control. See https://github.com/plexguide/Huntarr.io/issues/713
 """
@@ -13,6 +13,8 @@ logger = logging.getLogger("huntarr.seed_queue")
 QBITTORRENT_SEEDING_STATES = ("uploading", "stalledUP")
 # Transmission status 6 = seeding
 TRANSMISSION_STATUS_SEEDING = 6
+# Deluge torrent state that counts as seeding
+DELUGE_SEEDING_STATE = "Seeding"
 
 
 def get_seeding_count(config: Dict[str, Any], timeout: int = 15) -> Tuple[int, str]:
@@ -28,12 +30,13 @@ def get_seeding_count(config: Dict[str, Any], timeout: int = 15) -> Tuple[int, s
     if not host:
         return 0, "Torrent client host is empty"
     port = config.get("port")
+    default_port = {"qbittorrent": 8080, "transmission": 9091, "deluge": 8112}.get(client_type, 8080)
     if port is None or port == "":
-        port = 8080 if client_type == "qbittorrent" else 9091
+        port = default_port
     try:
         port = int(port)
     except (TypeError, ValueError):
-        port = 8080 if client_type == "qbittorrent" else 9091
+        port = default_port
     username = (config.get("username") or "").strip()
     password = config.get("password") or ""
 
@@ -41,6 +44,8 @@ def get_seeding_count(config: Dict[str, Any], timeout: int = 15) -> Tuple[int, s
         return _qbittorrent_seeding_count(host, port, username, password, timeout)
     if client_type == "transmission":
         return _transmission_seeding_count(host, port, username, password, timeout)
+    if client_type == "deluge":
+        return _deluge_seeding_count(host, port, password, timeout)
     return 0, f"Unknown torrent client type: {client_type or 'empty'}"
 
 
@@ -117,4 +122,60 @@ def _transmission_seeding_count(host: str, port: int, username: str, password: s
     if not isinstance(torrents, list):
         return 0, "Transmission unexpected response format"
     count = sum(1 for t in torrents if isinstance(t, dict) and t.get("status") == TRANSMISSION_STATUS_SEEDING)
+    return count, ""
+
+
+def _deluge_seeding_count(host: str, port: int, password: str, timeout: int) -> Tuple[int, str]:
+    """Deluge JSON-RPC: authenticate then get torrent list filtered to Seeding state."""
+    try:
+        from src.primary.settings_manager import get_ssl_verify_setting
+        import requests
+    except ImportError as e:
+        return 0, str(e)
+
+    base = (f"https://{host}:{port}" if port in (443, 8443) else f"http://{host}:{port}").rstrip("/")
+    rpc_url = f"{base}/json"
+    verify_ssl = get_ssl_verify_setting()
+    session = requests.Session()
+    session.verify = verify_ssl
+
+    # Authenticate
+    try:
+        auth_resp = session.post(
+            rpc_url,
+            json={"method": "auth.login", "params": [password or ""], "id": 1},
+            timeout=timeout,
+        )
+    except Exception as e:
+        return 0, f"Deluge auth request failed: {e}"
+    if auth_resp.status_code != 200:
+        return 0, f"Deluge returned {auth_resp.status_code} on auth"
+    try:
+        auth_data = auth_resp.json()
+    except Exception as e:
+        return 0, f"Deluge invalid JSON on auth: {e}"
+    if not auth_data.get("result"):
+        return 0, "Deluge authentication failed (check password)"
+
+    # Get torrent list — request only the 'state' field to keep payload small
+    try:
+        torrents_resp = session.post(
+            rpc_url,
+            json={"method": "core.get_torrents_status", "params": [{}, ["state"]], "id": 2},
+            timeout=timeout,
+        )
+    except Exception as e:
+        return 0, f"Deluge get_torrents_status request failed: {e}"
+    if torrents_resp.status_code != 200:
+        return 0, f"Deluge returned {torrents_resp.status_code} on torrent list"
+    try:
+        torrents_data = torrents_resp.json()
+    except Exception as e:
+        return 0, f"Deluge invalid JSON on torrent list: {e}"
+
+    result = torrents_data.get("result")
+    if not isinstance(result, dict):
+        return 0, "Deluge unexpected torrent list format"
+
+    count = sum(1 for t in result.values() if isinstance(t, dict) and t.get("state") == DELUGE_SEEDING_STATE)
     return count, ""
