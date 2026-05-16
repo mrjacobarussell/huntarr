@@ -722,6 +722,49 @@ def _get_download_client_queue(client, instance_id):
                     'original_release': nzb_name,
                 })
             _prune_requested_queue_ids(name, current_queue_ids, instance_id)
+        elif client_type == 'deemix':
+            url = '%s/api/get/currentQueue' % base_url
+            try:
+                r = requests.get(url, timeout=15, verify=verify_ssl)
+                r.raise_for_status()
+                queue_data = r.json()
+                slots = queue_data if isinstance(queue_data, list) else (queue_data.get('queue') or [])
+                for slot in slots:
+                    if not isinstance(slot, dict):
+                        continue
+                    item_uuid = slot.get('uuid') or slot.get('id')
+                    if item_uuid is not None:
+                        current_queue_ids.add(str(item_uuid))
+                    if item_uuid is None or str(item_uuid) not in requested_ids:
+                        continue
+                    filename = (slot.get('title') or slot.get('name') or '-').strip() or '-'
+                    display = _get_requested_display(name, item_uuid, instance_id)
+                    display_name = _format_queue_display_name(filename, display.get('title'), display.get('year'))
+                    scoring_str = _format_queue_scoring(display.get('score'), display.get('score_breakdown'))
+                    progress_raw = slot.get('progress') or slot.get('downloaded') or 0
+                    try:
+                        progress = str(min(100, max(0, int(float(progress_raw))))) + '%'
+                    except (TypeError, ValueError):
+                        progress = '-'
+                    if progress == '100%':
+                        progress = 'Pending Import'
+                    items.append({
+                        'id': item_uuid,
+                        'movie': display_name,
+                        'title': display_name,
+                        'year': None,
+                        'languages': '-',
+                        'quality': '-',
+                        'formats': '-',
+                        'scoring': scoring_str,
+                        'time_left': '-',
+                        'progress': progress,
+                        'instance_name': name,
+                        'original_release': filename,
+                    })
+            except requests.RequestException as e:
+                movie_hunt_logger.warning("Queue: Deemix request failed for %s: %s", name, e)
+            _prune_requested_queue_ids(name, current_queue_ids, instance_id)
     except Exception as e:
         logger.debug("Movie Hunt activity queue from download client %s: %s", name, e)
     return items
@@ -792,6 +835,15 @@ def _delete_from_download_client(client, item_ids):
                 data = r.json()
                 if data.get('result') is True:
                     removed = len(ids_int)
+        elif client_type == 'deemix':
+            url = '%s/api/delete/queueItem' % base_url
+            for iid in item_ids:
+                try:
+                    r = requests.delete(url, params={'pUuid': str(iid)}, timeout=15, verify=verify_ssl)
+                    r.raise_for_status()
+                    removed += 1
+                except requests.RequestException as e:
+                    movie_hunt_logger.warning("Queue: Deemix delete failed for %s item %s: %s", name, iid, e)
     except Exception as e:
         return removed, str(e) or 'Delete failed'
     failed = len(item_ids) - removed

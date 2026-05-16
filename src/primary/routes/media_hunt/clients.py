@@ -334,6 +334,19 @@ def _register_clients_routes(bp, get_instance_id, config_key, route_prefix, use_
                 except Exception as e:
                     return jsonify({'success': False, 'message': str(e)}), 200
 
+            elif client_type == 'deemix':
+                test_url = f"{base_url}/api/get/settings"
+                try:
+                    response = requests.get(test_url, timeout=10, verify=verify_ssl)
+                    response.raise_for_status()
+                    return jsonify({'success': True, 'message': 'Connected to Deemix'}), 200
+                except requests.exceptions.Timeout:
+                    return jsonify({'success': False, 'message': 'Connection timeout'}), 200
+                except requests.exceptions.ConnectionError:
+                    return jsonify({'success': False, 'message': 'Connection refused - Check host and port'}), 200
+                except Exception as e:
+                    return jsonify({'success': False, 'message': str(e)}), 200
+
             return jsonify({'success': False, 'message': f'Unknown client type: {client_type}'}), 400
         except Exception as e:
             logger.exception('Client connection test error')

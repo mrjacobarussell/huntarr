@@ -295,6 +295,10 @@ def get_cycle_status(app_type: Optional[str] = None) -> Dict[str, Any]:
                             del result[app]["_id_to_name"]
                 return result
         except Exception as e:
+            err_str = str(e).lower()
+            if "database disk image is malformed" in err_str or "file is not a database" in err_str:
+                logger.warning(f"Database temporarily unavailable for cycle status: {e}")
+                return {}
             logger.error(f"Error getting cycle status: {e}")
             return {"error": str(e)}
 

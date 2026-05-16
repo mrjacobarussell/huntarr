@@ -287,7 +287,7 @@ def process_cutoff_upgrades(
             
             try:
                 from src.primary.stats_manager import increment_stat_only
-                increment_stat_only("movie_hunt", "found", 1, str(instance_id))
+                increment_stat_only("movie_hunt", "found_upgrade", 1, str(instance_id))
             except Exception:
                 pass
             
