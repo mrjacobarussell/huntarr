@@ -283,7 +283,12 @@ jobs:
             }]')
           fi
           
-          echo "sponsors=$PROCESSED_SPONSORS" >> $GITHUB_OUTPUT
+          # Multi-line safe output for GITHUB_OUTPUT
+          {
+            echo 'sponsors<<GHEOF'
+            echo "$PROCESSED_SPONSORS"
+            echo 'GHEOF'
+          } >> $GITHUB_OUTPUT
           echo "Found $(echo "$PROCESSED_SPONSORS" | jq length) sponsors"
 
       - name: Create manifest.json
@@ -294,10 +299,10 @@ jobs:
             "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "sponsors": ${{ steps.sponsors.outputs.sponsors }},
             "project": {
-              "name": "Huntarr",
+              "name": "Huntarr Revisited",
               "description": "Automated media management for the masses",
               "repository": "${{ github.repository }}",
-              "website": "https://plexguide.github.io/Huntarr.io"
+              "website": "https://github.com/${{ github.repository }}"
             }
           }
           EOF

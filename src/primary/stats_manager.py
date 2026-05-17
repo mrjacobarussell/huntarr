@@ -518,33 +518,6 @@ def get_stats() -> Dict[str, Any]:
                 else:
                     stats[app_type]["instances"] = per_instance_list if per_instance_list else []
 
-            # Add movie_hunt and tv_hunt instance stats
-            for hunt_type in ["movie_hunt", "tv_hunt"]:
-                if hunt_type not in stats:
-                    stats[hunt_type] = {"hunted": 0, "upgraded": 0, "found": 0, "found_upgrade": 0}
-                try:
-                    app_module = __import__(f"src.primary.apps.{hunt_type}", fromlist=["get_configured_instances"])
-                    get_instances = getattr(app_module, "get_configured_instances", None)
-                    hunt_instances = list(get_instances(quiet=True)) if get_instances else []
-                except Exception:
-                    hunt_instances = []
-                per_instance_list = all_per_instance_stats.get(hunt_type, [])
-                per_instance_caps = all_per_instance_caps.get(hunt_type, {})
-                by_id = {p["instance_name"]: p for p in per_instance_list} if isinstance(per_instance_list, list) else {}
-                if hunt_instances:
-                    stats[hunt_type]["instances"] = []
-                    for inst in hunt_instances:
-                        iid = str(inst.get("instance_id") or inst.get("id") or inst.get("instance_name", "Default"))
-                        display_name = inst.get("instance_name", "Default")
-                        inst_stats = by_id.get(iid, {})
-                        cap_data = per_instance_caps.get(iid, {})
-                        stats[hunt_type]["instances"].append({
-                            "instance_name": display_name,
-                            "hunted": inst_stats.get("hunted", 0),
-                            "found": inst_stats.get("found", 0),
-                            "found_upgrade": inst_stats.get("found_upgrade", 0),
-                            "api_hits": cap_data.get("api_hits", 0),
-                        })
         except Exception as e:
             logger.error(f"Error attaching per-instance stats: {e}")
         return stats

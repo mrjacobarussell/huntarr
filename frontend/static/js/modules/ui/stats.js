@@ -18,10 +18,8 @@ window.HuntarrStats = {
         readarr:    { label: 'Readarr',    icon: './static/images/app-icons/readarr.png', accent: '#a855f7' },
         whisparr:   { label: 'Whisparr V2', icon: './static/images/app-icons/whisparr.png', accent: '#ec4899' },
         eros:       { label: 'Whisparr V3', icon: './static/images/app-icons/whisparr.png', accent: '#ec4899' },
-        movie_hunt: { label: 'Movie Hunt', icon: './static/logo/256.png', accent: '#f5a623' },
-        tv_hunt:    { label: 'TV Hunt',    icon: './static/logo/256.png', accent: '#f5a623' }
     },
-    DEFAULT_APP_ORDER: ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros', 'movie_hunt', 'tv_hunt'],
+    DEFAULT_APP_ORDER: ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros'],
 
     // ─── Polling ──────────────────────────────────────────────────────
     startPolling: function() {
