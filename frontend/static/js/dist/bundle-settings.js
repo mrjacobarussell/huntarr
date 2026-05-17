@@ -1822,7 +1822,7 @@ document.head.appendChild(styleEl);
                             <label>Sleep Duration (Minutes)</label>
                             <input type="number" id="editor-sleep-duration" value="${Math.round((safeInstance.sleep_duration || 900) / 60)}" min="${sleepMin}" max="1440">
                         </div>
-                        <p class="editor-help-text">Time in minutes between processing cycles (minimum ${sleepMin} minute${sleepMin === 1 ? '' : 's'}${devMode ? '; dev mode' : ''})</p>
+                        <p class="editor-help-text">Time in minutes between processing cycles (minimum ${sleepMin} minute${sleepMin === 1 ? '' : 's'})</p>
                     </div>
                     
                     <div class="editor-field-group">
