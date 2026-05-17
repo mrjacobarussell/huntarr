@@ -788,7 +788,7 @@ window.SettingsForms = {
                     return sel.value;
                 })(),
                 base_url: getVal('base_url', ''),
-                dev_key: getVal('dev_key', ''),
+
                 web_server_threads: parseInt(container.querySelector('#web_server_threads')?.value || '32'),
             };
         }
@@ -865,7 +865,7 @@ window.SettingsForms = {
             settings.enable_media_hunt = !getInputValue("#disable_media_hunt", false);
             settings.enable_third_party_apps = !getInputValue("#disable_third_party_apps", false);
             settings.base_url = getInputValue("#base_url", "");
-            settings.dev_key = getInputValue("#dev_key", "");
+
 
             const notificationsContainer = document.querySelector("#notificationsContainer");
             const getNotificationInputValue = (id, defaultValue) => {

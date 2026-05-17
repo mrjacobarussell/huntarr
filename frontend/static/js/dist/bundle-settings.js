@@ -790,7 +790,7 @@ window.SettingsForms = {
                     return sel.value;
                 })(),
                 base_url: getVal('base_url', ''),
-                dev_key: getVal('dev_key', ''),
+
                 web_server_threads: parseInt(container.querySelector('#web_server_threads')?.value || '32'),
             };
         }
@@ -867,7 +867,7 @@ window.SettingsForms = {
             settings.enable_media_hunt = !getInputValue("#disable_media_hunt", false);
             settings.enable_third_party_apps = !getInputValue("#disable_third_party_apps", false);
             settings.base_url = getInputValue("#base_url", "");
-            settings.dev_key = getInputValue("#dev_key", "");
+
 
             const notificationsContainer = document.querySelector("#notificationsContainer");
             const getNotificationInputValue = (id, defaultValue) => {
@@ -1486,6 +1486,7 @@ document.head.appendChild(styleEl);
             safeInstance.hunt_missing_mode = instance.hunt_missing_mode || 'album';
             safeInstance.upgrade_selection_method = instance.upgrade_selection_method !== undefined ? instance.upgrade_selection_method : 'cutoff';
             safeInstance.upgrade_tag = instance.upgrade_tag !== undefined ? instance.upgrade_tag : '';
+            safeInstance.clear_low_match_queue = instance.clear_low_match_queue === true;
         } else if (appType === 'readarr') {
             safeInstance.hunt_missing_items = instance.hunt_missing_books !== undefined ? instance.hunt_missing_books : 1;
             safeInstance.hunt_upgrade_items = instance.hunt_upgrade_books !== undefined ? instance.hunt_upgrade_books : 0;
@@ -1497,8 +1498,7 @@ document.head.appendChild(styleEl);
             safeInstance.search_mode = instance.search_mode !== undefined ? instance.search_mode : 'movie';
         }
 
-        const devMode = !!(window.huntarrUI && window.huntarrUI.originalSettings && window.huntarrUI.originalSettings.general && window.huntarrUI.originalSettings.general.dev_mode);
-        const sleepMin = devMode ? 1 : 10;
+        const sleepMin = 10;
 
         // Default port and example URL per app (for placeholder and help text)
         const defaultPortByApp = { sonarr: 8989, radarr: 7878, lidarr: 8686, readarr: 8787, whisparr: 6969, eros: 6969 };
@@ -1674,6 +1674,16 @@ document.head.appendChild(styleEl);
                             </select>
                         </div>
                         <p class="editor-help-text">Search for individual albums (Artist mode deprecated in Huntarr 7.5.0+)</p>
+                    </div>
+                    <div class="editor-field-group">
+                        <div class="editor-setting-item">
+                            <label>Clear Low-Match Queue Items</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="editor-clear-low-match" ${safeInstance.clear_low_match_queue ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <p class="editor-help-text">Before each search cycle, remove and blacklist any queue items stuck in <em>importPending</em> due to a low match percentage so Lidarr will re-search for a better release.</p>
                     </div>
                 `;
             }
@@ -1990,8 +2000,9 @@ document.head.appendChild(styleEl);
                         <div class="editor-setting-item" style="margin-top: 10px;">
                             <label>Torrent client type</label>
                             <select id="editor-seed-client-type">
-                                <option value="qbittorrent" ${!(safeInstance.seed_check_torrent_client && safeInstance.seed_check_torrent_client.type === 'transmission') ? 'selected' : ''}>qBittorrent</option>
+                                <option value="qbittorrent" ${(!safeInstance.seed_check_torrent_client || safeInstance.seed_check_torrent_client.type === 'qbittorrent') ? 'selected' : ''}>qBittorrent</option>
                                 <option value="transmission" ${(safeInstance.seed_check_torrent_client && safeInstance.seed_check_torrent_client.type === 'transmission') ? 'selected' : ''}>Transmission</option>
+                                <option value="deluge" ${(safeInstance.seed_check_torrent_client && safeInstance.seed_check_torrent_client.type === 'deluge') ? 'selected' : ''}>Deluge</option>
                             </select>
                         </div>
                         <div class="editor-setting-item">
@@ -2065,8 +2076,9 @@ document.head.appendChild(styleEl);
                 const host = hostEl ? (hostEl.value || '').trim() : '';
                 if (!host) return null;
                 const portEl = document.getElementById('editor-seed-client-port');
-                const portVal = portEl && portEl.value !== '' ? parseInt(portEl.value, 10) : (type === 'qbittorrent' ? 8080 : 9091);
-                const port = (!isNaN(portVal) && portVal >= 1 && portVal <= 65535) ? portVal : (type === 'qbittorrent' ? 8080 : 9091);
+                const defaultPort = type === 'qbittorrent' ? 8080 : type === 'deluge' ? 8112 : 9091;
+                const portVal = portEl && portEl.value !== '' ? parseInt(portEl.value, 10) : defaultPort;
+                const port = (!isNaN(portVal) && portVal >= 1 && portVal <= 65535) ? portVal : defaultPort;
                 const userEl = document.getElementById('editor-seed-client-username');
                 const passEl = document.getElementById('editor-seed-client-password');
                 return { type: type, host: host, port: port, username: userEl ? userEl.value : '', password: passEl ? passEl.value : '' };
@@ -2131,6 +2143,8 @@ document.head.appendChild(styleEl);
              if (appType === 'lidarr') {
                  const lidarrModeEl = document.getElementById('editor-lidarr-missing-mode');
                  if (lidarrModeEl) newData.hunt_missing_mode = lidarrModeEl.value || 'album';
+                 const clearLowMatchEl = document.getElementById('editor-clear-low-match');
+                 if (clearLowMatchEl) newData.clear_low_match_queue = clearLowMatchEl.checked;
              }
              if (appType === 'eros') {
                  const erosModeEl = document.getElementById('editor-eros-search-mode');
@@ -14674,11 +14688,7 @@ document.head.appendChild(styleEl);
                             <input type="password" id="tmdb_api_key" value="${settings.tmdb_api_key || ""}" placeholder="Leave blank to use the built-in key" class="mset-input">
                             <p class="setting-help">Override the built-in TMDB API key with your own. Get one free at <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org/settings/api</a>.</p>
                         </div>
-                        <div class="setting-item">
-                            <label for="dev_key">Huntarr Dev Key:${settings.dev_mode === true ? ' <i class="fas fa-check-circle" style="color: #22c55e; margin-left: 5px;" title="Dev Mode Active"></i>' : ''}</label>
-                            <input type="password" id="dev_key" value="${settings.dev_key || ""}" placeholder="Enter dev key" class="mset-input">
-                            <p class="setting-help">Enter development key to enable dev mode.</p>
-                        </div>
+
                         <div class="setting-item" style="margin-top: 15px;">
                             <label for="web_server_threads">Web Server Threads:</label>
                             <select id="web_server_threads" class="mset-select">

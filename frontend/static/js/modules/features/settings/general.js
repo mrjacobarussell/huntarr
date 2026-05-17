@@ -163,11 +163,7 @@
                             <input type="password" id="tmdb_api_key" value="${settings.tmdb_api_key || ""}" placeholder="Leave blank to use the built-in key" class="mset-input">
                             <p class="setting-help">Override the built-in TMDB API key with your own. Get one free at <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org/settings/api</a>.</p>
                         </div>
-                        <div class="setting-item">
-                            <label for="dev_key">Huntarr Dev Key:${settings.dev_mode === true ? ' <i class="fas fa-check-circle" style="color: #22c55e; margin-left: 5px;" title="Dev Mode Active"></i>' : ''}</label>
-                            <input type="password" id="dev_key" value="${settings.dev_key || ""}" placeholder="Enter dev key" class="mset-input">
-                            <p class="setting-help">Enter development key to enable dev mode.</p>
-                        </div>
+
                         <div class="setting-item" style="margin-top: 15px;">
                             <label for="web_server_threads">Web Server Threads:</label>
                             <select id="web_server_threads" class="mset-select">

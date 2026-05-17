@@ -8,7 +8,7 @@ Supports default configurations for different Arr applications
 import os
 import json
 import logging
-import hashlib
+
 import time
 import threading
 import copy
@@ -20,9 +20,6 @@ from src.primary.utils.encryption import encrypt_value, decrypt_value, ENCRYPTED
 MASKED_VALUE = "****"
 # Fields treated as secrets — encrypted at rest, masked in API responses.
 _SENSITIVE_KEYS = frozenset(["api_key"])
-
-# SHA-256 hash of the valid Huntarr dev key (constant only; plaintext never stored)
-_DEV_KEY_HASH = "81fc4fcfa6ec4a7a19c9aafe60eea0022ef2c5d05f78484b77cf6578d983f6d3"
 
 # Create a simple logger for settings_manager
 logging.basicConfig(level=logging.INFO)
@@ -310,13 +307,7 @@ def save_settings(app_name: str, settings_data: Dict[str, Any]) -> bool:
         'hunt_missing_movies', 'hunt_upgrade_movies', 'hunt_missing_books', 'hunt_upgrade_books'
     ]
     
-    # Sleep duration: min 600s (10 min) normally; min 60s (1 min) when dev mode (allows 1-min, does not force it)
-    # When saving general, use incoming data to avoid load_settings -> save_settings -> is_dev_mode -> load_settings recursion
-    if app_name == 'general':
-        _dev = _is_dev_mode_from_general(settings_data)
-    else:
-        _dev = is_dev_mode()
-    _sleep_min = 60 if _dev else 600
+    _sleep_min = 600
     if 'sleep_duration' in settings_data:
         original_value = settings_data['sleep_duration']
         if isinstance(original_value, (int, float)) and original_value < _sleep_min:
@@ -443,20 +434,6 @@ def get_tmdb_api_key() -> str:
     return user_key if user_key else _TMDB_FALLBACK_KEY
 
 
-def _is_dev_mode_from_general(general_dict: Dict[str, Any]) -> bool:
-    """Compute dev mode from a general settings dict. Used to avoid load_settings recursion when saving general."""
-    key = (general_dict.get("dev_key") or "").strip()
-    if not key:
-        return False
-    return hashlib.sha256(key.encode()).hexdigest() == _DEV_KEY_HASH
-
-
-def is_dev_mode() -> bool:
-    """Return True if Huntarr dev mode is enabled (valid dev key saved in general settings)."""
-    general = load_settings("general", use_cache=True)
-    return _is_dev_mode_from_general(general)
-
-
 def get_all_settings() -> Dict[str, Dict[str, Any]]:
     """Load settings for all known apps."""
     all_settings = {}
@@ -464,12 +441,7 @@ def get_all_settings() -> Dict[str, Dict[str, Any]]:
         settings = load_settings(app_name)
         if not settings:
             continue
-        if app_name == "general":
-            s = dict(settings)
-            s["dev_mode"] = is_dev_mode()
-            all_settings[app_name] = s
-        else:
-            all_settings[app_name] = settings
+        all_settings[app_name] = settings
     return all_settings
 
 def get_configured_apps() -> List[str]:
