@@ -16,6 +16,17 @@
 
 ---
 
+> [!IMPORTANT]
+> **This fork is no longer under active development.**
+>
+> Huntarr Revisited served as a maintained fork of [plexguide/Huntarr.io](https://github.com/plexguide/Huntarr.io) with several additions (Swaparr quality-rejection handling, Lidarr low-match clearing, mount-aware import retry, and more). Development has concluded here.
+>
+> The successor project is **Sniparr** — a ground-up rewrite that keeps everything you relied on here and builds it on a modern, async-first foundation. Follow along or contribute at [github.com/mrjacobarussell/sniparr](https://github.com/mrjacobarussell/sniparr).
+>
+> This repository remains available as a reference and for anyone still running the existing Docker image. No further updates, bug fixes, or feature additions are planned.
+
+---
+
 ## What It Does
 
 Your *arr apps (Sonarr, Radarr, etc.) monitor RSS feeds for new releases — but they don't go back and search for content already in your library that never downloaded. Huntarr fills that gap.
@@ -95,4 +106,4 @@ Hourly API caps and queue size limits are built in to keep your indexers happy.
 
 ---
 
-*A fork of [plexguide/Huntarr.io](https://github.com/plexguide/Huntarr.io), maintained by [MrJacobarussell](https://github.com/mrjacobarussell).*
+*A fork of [plexguide/Huntarr.io](https://github.com/plexguide/Huntarr.io), originally maintained by [MrJacobarussell](https://github.com/mrjacobarussell). Archived — see [Sniparr](https://github.com/mrjacobarussell/sniparr) for the successor project.*
